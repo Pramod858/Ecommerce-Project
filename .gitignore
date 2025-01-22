@@ -1,0 +1,79 @@
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# ------------------------------
+# Spring Boot (Back-End-Ecommerce)
+# ------------------------------
+Back-End-Ecommerce/HELP.md
+Back-End-Ecommerce/target/
+!Back-End-Ecommerce/.mvn/wrapper/maven-wrapper.jar
+!Back-End-Ecommerce/**/src/main/**/target/
+!Back-End-Ecommerce/**/src/test/**/target/
+
+## STS (Spring Tool Suite) ##
+Back-End-Ecommerce/.apt_generated
+Back-End-Ecommerce/.classpath
+Back-End-Ecommerce/.factorypath
+Back-End-Ecommerce/.project
+Back-End-Ecommerce/.settings
+Back-End-Ecommerce/.springBeans
+Back-End-Ecommerce/.sts4-cache
+
+## IntelliJ IDEA ##
+Back-End-Ecommerce/.idea
+Back-End-Ecommerce/*.iws
+Back-End-Ecommerce/*.iml
+Back-End-Ecommerce/*.ipr
+
+## NetBeans ##
+Back-End-Ecommerce/nbproject/private/
+Back-End-Ecommerce/nbbuild/
+Back-End-Ecommerce/dist/
+Back-End-Ecommerce/nbdist/
+Back-End-Ecommerce/.nb-gradle/
+Back-End-Ecommerce/build/
+!Back-End-Ecommerce/**/src/main/**/build/
+!Back-End-Ecommerce/**/src/test/**/build/
+
+## Visual Studio Code ##
+Back-End-Ecommerce/.vscode/
+
+# ------------------------------
+# Angular (Front-End-Ecommerce)
+# ------------------------------
+Front-End-Ecommerce/dist/
+Front-End-Ecommerce/tmp/
+Front-End-Ecommerce/out-tsc/
+Front-End-Ecommerce/bazel-out/
+
+## Node Modules ##
+Front-End-Ecommerce/node_modules/
+Front-End-Ecommerce/npm-debug.log
+Front-End-Ecommerce/yarn-error.log
+
+## Angular Cache and Coverage ##
+Front-End-Ecommerce/.angular/cache/
+Front-End-Ecommerce/.sass-cache/
+Front-End-Ecommerce/connect.lock
+Front-End-Ecommerce/coverage/
+Front-End-Ecommerce/libpeerconnection.log
+Front-End-Ecommerce/testem.log
+Front-End-Ecommerce/typings/
+
+## IDEs and Editors ##
+Front-End-Ecommerce/.idea/
+Front-End-Ecommerce/.project
+Front-End-Ecommerce/.classpath
+Front-End-Ecommerce/.c9/
+Front-End-Ecommerce/*.launch
+Front-End-Ecommerce/.settings/
+Front-End-Ecommerce/*.sublime-workspace
+
+## Visual Studio Code ##
+Front-End-Ecommerce/.vscode/*
+!Front-End-Ecommerce/.vscode/settings.json
+!Front-End-Ecommerce/.vscode/tasks.json
+!Front-End-Ecommerce/.vscode/launch.json
+!Front-End-Ecommerce/.vscode/extensions.json
+Front-End-Ecommerce/.history/
