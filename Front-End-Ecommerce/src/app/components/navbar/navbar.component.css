@@ -1,0 +1,11 @@
+.navbar-brand img {
+    max-height: 40px;
+}
+
+.navbar-nav .nav-item {
+    margin: 0 10px;
+}
+
+.badge {
+    font-size: 12px;
+}

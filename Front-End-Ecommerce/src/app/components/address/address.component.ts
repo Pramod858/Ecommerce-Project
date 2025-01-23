@@ -1,0 +1,127 @@
+import { Component } from '@angular/core';
+import { AddressService } from '../../services/address.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Address } from '../../models/address.model';
+
+@Component({
+  selector: 'app-address',
+  standalone: false,
+  templateUrl: './address.component.html',
+  styleUrls: ['./address.component.css']
+})
+export class AddressComponent {
+
+  addresses: Address[] = [];
+  selectedAddress: Address | null = null;
+  token: string | null;
+
+  addressForm: FormGroup;
+  isEditMode: boolean = false;
+  currentAddressId: number | null = null;
+
+  constructor(private addressService: AddressService, private fb: FormBuilder) {
+    this.token = localStorage.getItem('token');
+    this.addressForm = this.fb.group({
+      streetAddress: ['', Validators.required],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      zipCode: ['', Validators.required],
+      country: ['', Validators.required]
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadAddresses();
+  }
+
+  loadAddresses(): void {
+    if (this.token) {
+      this.addressService.getAllAddressesForUser(this.token).subscribe({
+        next: (data: Address[]) => {
+          this.addresses = data;
+        },
+        error: (error: any) => {
+          console.error("Error loading addresses:", error);
+        }
+      });
+    }
+  }
+
+  openAddAddressModal(): void {
+    this.isEditMode = false;
+    this.addressForm.reset();
+    const modal = document.getElementById('addAddressModal');
+    if (modal) {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+    }
+  }
+
+  openEditAddressModal(address: Address): void {
+    this.isEditMode = true;
+    this.currentAddressId = address.id;
+    this.addressForm.patchValue(address);
+
+    const modal = document.getElementById('editAddressModal');
+    if (modal) {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+    }
+  }
+
+  closeModal(): void {
+    const addModal = document.getElementById('addAddressModal');
+    const editModal = document.getElementById('editAddressModal');
+    if (addModal) {
+      addModal.classList.remove('show');
+      addModal.style.display = 'none';
+    }
+    if (editModal) {
+      editModal.classList.remove('show');
+      editModal.style.display = 'none';
+    }
+  }
+
+  saveAddress(): void {
+    if (this.addressForm.valid && this.token) {
+      const addressData: Address = this.addressForm.value;
+      if (this.isEditMode && this.currentAddressId) {
+        this.addressService.updateAddress(this.currentAddressId, addressData, this.token).subscribe({
+          next: () => {
+            this.loadAddresses();
+            this.closeModal();
+          },
+          error: (error) => {
+            console.error("Error updating address:", error);
+          }
+        });
+      } else {
+        this.addressService.addAddress(addressData, this.token).subscribe({
+          next: (response: any) => {
+            alert('Address added successfully!');
+            this.loadAddresses();  // Refresh the list of addresses
+            this.closeModal();
+          },
+          error: (error) => {
+            console.error("Error creating address:", error);
+            alert('There was an error adding the address');
+          }
+        });        
+      }
+    }
+  }
+
+  deleteAddress(addressId: number): void {
+    if (this.token) {
+      this.addressService.deleteAddress(addressId, this.token).subscribe({
+        next: (response: any) => {
+          alert('Address deleted successfully!');
+          this.loadAddresses();
+        },
+        error: (error) => {
+          console.error("Error deleting address:", error);
+        }
+      });
+    }
+  }
+}

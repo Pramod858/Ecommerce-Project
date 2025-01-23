@@ -1,0 +1,136 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header text-center bg-dark text-white py-3">
+                    <h4>Sign Up</h4>
+                    <p class="small">Create your account and start shopping!</p>
+                </div>
+                <div class="card-body p-3">
+                    <form #registerForm="ngForm" (ngSubmit)="register()" novalidate>
+                        <!-- Full Name -->
+                        <div class="form-group mb-3">
+                            <label for="name" class="form-label small">Full Name</label>
+                            <div class="input-group position-relative">
+                                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                <input type="text" class="form-control rounded-3" id="name" [(ngModel)]="user.username" name="name"
+                                    #nameRef="ngModel" required minlength="3"
+                                    [ngClass]="{'border-danger': nameRef.invalid && nameRef.touched}" placeholder="Full Name" />
+                                <div class="error-message" *ngIf="nameRef.invalid && nameRef.touched">
+                                    <span *ngIf="nameRef.errors?.['required']">Name is required</span>
+                                    <span *ngIf="nameRef.errors?.['minlength']">Name must be at least 3 characters</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group mb-3">
+                            <label for="email" class="form-label small">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                                <input type="email" class="form-control rounded-3" id="email" [(ngModel)]="user.email" name="email"
+                                    #emailRef="ngModel" required email
+                                    [ngClass]="{
+                                      'border-danger': (emailRef.invalid && emailRef.touched) || emailExists,
+                                      'border-success': !emailRef.invalid && emailRef.touched && !emailExists
+                                    }"
+                                    placeholder="Email Address" (input)="checkEmailExists()" />
+                                <div class="error-message" *ngIf="emailRef.touched">
+                                    <span *ngIf="emailRef.errors?.['required']">Email is required</span>
+                                    <span *ngIf="emailRef.errors?.['email']">Enter a valid email</span>
+                                    <span *ngIf="emailExists && !emailRef.errors?.['email']">Email already exists</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="form-group mb-3">
+                            <label for="phone" class="form-label small">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                                <input type="tel" class="form-control rounded-3" id="phone" [(ngModel)]="user.phone" name="phone"
+                                    #phoneRef="ngModel" required pattern="^[0-9]{10}$"
+                                    [ngClass]="{'border-danger': (phoneRef.invalid && phoneRef.touched) || phoneExists}"
+                                    placeholder="Phone Number" (blur)="checkPhoneExists()" />
+                                <div class="error-message" *ngIf="phoneRef.invalid && phoneRef.touched">
+                                    <span *ngIf="phoneRef.errors?.['required']">Phone is required</span>
+                                    <span *ngIf="phoneRef.errors?.['pattern']">Enter a valid 10-digit phone number</span>
+                                    <span *ngIf="!phoneRef.errors?.['pattern'] && phoneExists">Phone number already exists</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group mb-3 position-relative">
+                            <label for="password" class="form-label small">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                <input 
+                                    [type]="hide ? 'password' : 'text'" 
+                                    class="form-control rounded-3" 
+                                    id="password" 
+                                    [(ngModel)]="user.password" 
+                                    name="password"
+                                    #passwordRef="ngModel" 
+                                    required minlength="6"
+                                    [ngClass]="{'border-danger': passwordRef.invalid && passwordRef.touched}" 
+                                    placeholder="Password" />
+                                    <div class="error-message" *ngIf="passwordRef.invalid && passwordRef.touched">
+                                        <span *ngIf="passwordRef.errors?.['required']">Password is required</span>
+                                        <span *ngIf="passwordRef.errors?.['minlength']">Password must be at least 6 characters</span>
+                                    </div>
+                                <span class="eye-icon position-absolute end-0 top-50 translate-middle-y pe-3" (click)="hidePassword()" style="cursor: pointer;">
+                                    <i class="fa" [ngClass]="hide ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="form-group mb-3">
+                            <label for="confirm_password" class="form-label small">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text position-relative">
+                                    <i class="bi bi-lock-fill"></i>
+                                    <i *ngIf="confirmPasswordRef.valid && !passwordsDontMatch" class="bi bi-check-circle-fill text-success check-icon"></i>
+                                </span>
+                                <input type="password" class="form-control rounded-3" id="confirm_password" 
+                                    [(ngModel)]="confirmPassword" 
+                                    (ngModelChange)="validatePasswordMatch()"
+                                    name="confirm_password"
+                                    #confirmPasswordRef="ngModel" required
+                                    [ngClass]="{'border-danger': confirmPasswordRef.touched}"
+                                    placeholder="Confirm Password" />
+                                <div class="error-message" *ngIf="confirmPasswordRef.touched">
+                                    <span *ngIf="confirmPasswordRef.errors?.['required']">Confirm password is required</span>
+                                    <span *ngIf="!confirmPasswordRef.errors?.['required'] && passwordsDontMatch">Passwords do not match</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms & Conditions -->
+                        <div class="form-group mb-3">
+                            <label class="form-check-label small">
+                                <input type="checkbox" [(ngModel)]="termsAccepted" name="terms"
+                                    (ngModelChange)="validateTerms()" #termsRef="ngModel" />
+                                I accept the <a href="#">Terms of Use</a> &amp; <a href="#">Privacy Policy</a>
+                            </label>
+                            <div class="error-message" *ngIf="!termsAccepted && termsTouched">
+                                <span>You must accept the terms</span>
+                            </div>
+                        </div>
+
+                        <!-- Register Button -->
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3" [disabled]="registerForm.invalid || passwordsDontMatch || !termsAccepted">Sign Up</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-footer text-center bg-light py-3">
+                    Already have an account? <a routerLink="/login" class="text-primary">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

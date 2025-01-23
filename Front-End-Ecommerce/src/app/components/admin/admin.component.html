@@ -1,0 +1,322 @@
+<div class="d-flex">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar bg-dark text-white p-3">
+        <h4>Admin Panel</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <button class="btn btn-outline-light w-100 mb-2" [class.active]="currentSection === 'users'" (click)="navigateTo('users')">Users</button>
+            </li>
+            <li class="nav-item">
+                <button class="btn btn-outline-light w-100 mb-2" [class.active]="currentSection === 'categories'" (click)="navigateTo('categories')">Categories</button>
+            </li>
+            <li class="nav-item">
+                <button class="btn btn-outline-light w-100 mb-2" [class.active]="currentSection === 'products'" (click)="navigateTo('products')">Products</button>
+            </li>
+            <li class="nav-item">
+                <button class="btn btn-outline-light w-100 mb-2" [class.active]="currentSection === 'carts'" (click)="navigateTo('carts')">Carts</button>
+            </li>
+            <li class="nav-item">
+                <button class="btn btn-outline-light w-100 mb-2" [class.active]="currentSection === 'orders'" (click)="navigateTo('orders')">Orders</button>
+            </li>
+        </ul>
+    </div>
+
+    <!-- User Management Section -->
+    <div class="container mt-4 flex-grow-1" *ngIf="currentSection === 'users'">
+        <h2>User Management</h2>
+
+        <!-- User List Table -->
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of users; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.phone }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" (click)="openEditUserModal(user)">Edit</button>
+                        <button class="btn btn-sm btn-danger" (click)="deleteUser(user.id)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Category Management Section -->
+    <div class="container mt-4 flex-grow-1" *ngIf="currentSection === 'categories'">
+        <h2>Category Management</h2>
+
+        <!-- Add Product Button -->
+        <button class="btn btn-primary mb-3" (click)="openAddCategoryModal()">Add Product</button>
+
+        <!-- Category List Table -->
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let category of categories; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ category.name }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" (click)="openEditCategoryModal(category)">Edit</button>
+                        <button class="btn btn-sm btn-danger" (click)="deleteCategory(category.id)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Product Management Section -->
+    <div class="container mt-4 flex-grow-1" *ngIf="currentSection === 'products'">
+        <h2>Product Management</h2>
+
+        <!-- Category Filter -->
+        <div class="mb-3">
+            <label for="categoryFilter" class="form-label">Select Category</label>
+            <select id="categoryFilter" class="for-select" (change)="onCategoryChange($event)">
+                <option value="">All Products</option>
+                <option *ngFor="let category of categories" [value]="category.id">
+                    {{ category.name }}
+                </option>
+            </select>
+        </div>
+
+        <!-- Add Product Button -->
+        <button class="btn btn-primary mb-3" (click)="openAddProductModal()">Add Product</button>
+
+        <!-- Product List Table -->
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Image URL</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let product of products; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.description }}</td>
+                    <td>{{ product.price | currency }}</td>
+                    <td>{{ product.stock}}</td>
+                    <td><a [href]="product.imageUrl">View Image</a></td>
+                    <td>
+                        <button class="btn btn-sm btn-info" (click)="openEditProductModal(product)">Edit</button>
+                        <button class="btn btn-sm btn-danger" (click)="deleteProduct(product.id)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" #editUserModal id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="userForm" (ngSubmit)="updateUser()">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Name</label>
+                        <input
+                            id="username"
+                            type="text"
+                            class="form-control"
+                            formControlName="username"
+                            [ngClass]="{ 'is-invalid': userForm.get('username')?.invalid && userForm.get('username')?.touched }"
+                        />
+                        <div *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched" class="invalid-feedback">
+                            Username is required and must be at least 3 characters long.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            class="form-control"
+                            formControlName="email"
+                            [ngClass]="{ 'is-invalid': userForm.get('email')?.invalid && userForm.get('email')?.touched }"
+                        />
+                        <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" class="invalid-feedback">
+                            Please enter a valid email address.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input
+                            id="phone"
+                            type="text"
+                            class="form-control"
+                            formControlName="phone"
+                            [ngClass]="{ 'is-invalid': userForm.get('phone')?.invalid && userForm.get('phone')?.touched }"
+                        />
+                        <div *ngIf="userForm.get('phone')?.invalid && userForm.get('phone')?.touched" class="invalid-feedback">
+                            Please enter a valid phone number.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" [disabled]="userForm.invalid">
+                        Update User
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Add/Edit Category Modal -->
+<div class="modal fade" #addCategoryModal id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">{{ isEditMode ? 'Edit Category' : 'Add Category' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Category Name</label>
+                        <input
+                            id="name"
+                            type="text"
+                            class="form-control"
+                            formControlName="name"
+                            [ngClass]="{ 'is-invalid': categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched }"
+                        />
+                        <div *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched" class="invalid-feedback">
+                            Category name is required and must be at least 3 characters long.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" [disabled]="categoryForm.invalid">
+                        {{ isEditMode ? 'Update Category' : 'Add Category' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Product Modal -->
+<div class="modal fade" #addProductModal id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel">{{ isEditMode ? 'Edit Product' : 'Add Product' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="productForm" (ngSubmit)="saveProduct()">
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select formControlName="categoryId" class="form-control" id="category">
+                            <option *ngFor="let category of categories" [value]="category.id">
+                                {{ category.name }}
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Product Name</label>
+                        <input
+                            id="name"
+                            type="text"
+                            class="form-control"
+                            formControlName="name"
+                            [ngClass]="{ 'is-invalid': productForm.get('name')?.invalid && productForm.get('name')?.touched }"
+                        />
+                        <div *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched" class="invalid-feedback">
+                            Product name is required and must be at least 3 characters long.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea
+                            id="description"
+                            class="form-control"
+                            formControlName="description"
+                            rows="3"
+                        ></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        <input
+                            id="price"
+                            type="number"
+                            class="form-control"
+                            formControlName="price"
+                            [ngClass]="{ 'is-invalid': productForm.get('price')?.invalid && productForm.get('price')?.touched }"
+                        />
+                        <div *ngIf="productForm.get('price')?.invalid && productForm.get('price')?.touched" class="invalid-feedback">
+                            Price is required and must be a positive number.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="stock" class="form-label">Stock</label>
+                        <input
+                            id="stock"
+                            type="number"
+                            class="form-control"
+                            formControlName="stock"
+                            [ngClass]="{ 'is-invalid': productForm.get('stock')?.invalid && productForm.get('stock')?.touched }"
+                        />
+                        <div *ngIf="productForm.get('stock')?.invalid && productForm.get('stock')?.touched" class="invalid-feedback">
+                            Stock is required and must be a positive number.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="imageUrl" class="form-label">Image URL</label>
+                        <input
+                            id="imageUrl"
+                            type="url"
+                            class="form-control"
+                            formControlName="imageUrl"
+                            [ngClass]="{ 'is-invalid': productForm.get('imageUrl')?.invalid && productForm.get('imageUrl')?.touched }"
+                        />
+                        <div *ngIf="productForm.get('imageUrl')?.invalid && productForm.get('imageUrl')?.touched" class="invalid-feedback">
+                            Please provide a valid URL.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" [disabled]="productForm.invalid">
+                        {{ isEditMode ? 'Update Product' : 'Add Product' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

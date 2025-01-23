@@ -1,0 +1,23 @@
+.order-card {
+transition: transform 0.3s ease-in-out;
+border-radius: 10px;
+}
+
+.order-card:hover {
+transform: scale(1.02);
+}
+
+.product-img {
+max-height: 100px;
+object-fit: cover;
+border-radius: 5px;
+}
+
+.card-header {
+border-top-left-radius: 10px;
+border-top-right-radius: 10px;
+}
+
+.badge {
+font-size: 14px;
+}

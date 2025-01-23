@@ -1,0 +1,12 @@
+.container {
+max-width: 900px;
+}
+
+.address-item {
+margin-bottom: 15px;
+border-radius: 5px;
+}
+
+.modal-content {
+border-radius: 10px;
+}

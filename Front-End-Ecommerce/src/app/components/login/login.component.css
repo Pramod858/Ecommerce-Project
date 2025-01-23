@@ -1,0 +1,20 @@
+/* Error message styles */
+.error-message {
+    display: none;
+    position: absolute;
+    bottom: -20px; /* Adjust this as needed */
+    left: 0;
+    font-size: 0.8rem;
+    color: #dc3545; /* Red color for error */
+}
+
+/* Show error message when input is invalid */
+input.is-invalid + .error-message,
+input:invalid + .error-message {
+    display: block;
+}
+
+/* Style for checkboxes */
+input[type="checkbox"].is-invalid + .error-message {
+    display: block;
+}
