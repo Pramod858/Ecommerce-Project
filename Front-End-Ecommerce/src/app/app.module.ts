@@ -10,7 +10,6 @@ import { provideHttpClient } from '@angular/common/http';
 import { HomeComponent } from './components/home/home.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { MAT_DIALOG_DEFAULT_OPTIONS, MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ErrorDialogComponent } from './error-dialog/error-dialog.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { ProductComponent } from './components/product/product.component';
 import { CartComponent } from './components/cart/cart.component';
@@ -28,7 +27,6 @@ import { CheckoutComponent } from './components/checkout/checkout.component';
     LoginComponent,
     HomeComponent,
     NavbarComponent,
-    ErrorDialogComponent,
     AdminComponent,
     ProductComponent,
     CartComponent,
