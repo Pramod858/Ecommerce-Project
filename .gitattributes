@@ -1,0 +1,10 @@
+# Set the default behavior for all files
+* text=auto
+
+# Explicitly specify file types that should always use LF line endings
+*.java text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
