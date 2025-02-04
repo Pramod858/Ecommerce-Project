@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../models/user.model';
+import { ApiResponse } from '../models/api.response';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -10,23 +11,15 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  checkEmailExists(email: string): Observable<boolean> {
-    return this.http.get<boolean>(`/api/users/check-email?email=${email}`);
+  getUsers(): Observable<ApiResponse<User[]>> {
+    return this.http.get<ApiResponse<User[]>>(`${this.baseUrl}`);
   }
 
-  checkPhoneExists(phone: string): Observable<boolean> {
-    return this.http.get<boolean>(`/api/users/check-phone?phone=${phone}`);
+  updateUser(id: number, user: User): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.baseUrl}/${id}`, user);
   }
 
-  getUsers(): Observable<User[]> {
-      return this.http.get<User[]>(`${this.baseUrl}`);
-  }
-
-  updateUser(id: number, user: User): Observable<User> {
-    return this.http.put<User>(`${this.baseUrl}/${id}`, user);
-  }
-
-  deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  deleteUser(id: number): Observable<ApiResponse<any>> {
+    return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/${id}`);
   }
 }

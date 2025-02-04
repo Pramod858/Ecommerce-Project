@@ -15,6 +15,12 @@
     transition: opacity 0.3s;
 }
 
+.card-img-top {
+    width: 100%; /* Ensure the image covers the full width of the card */
+    height: 200px; /* Set a fixed height */
+    object-fit: cover; /* Ensure the image covers the entire area without distortion */
+}
+
 .image-container:hover .overlay {
     opacity: 1;
 }

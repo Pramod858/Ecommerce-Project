@@ -3,6 +3,8 @@ import { Product } from '../../models/product.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
+import { ApiResponse } from '../../models/api.response';
+import { error } from 'jquery';
 
 @Component({
   selector: 'app-product',
@@ -16,6 +18,7 @@ export class ProductComponent {
   product!: Product;
   quantity: number = 1;
   token: string | null;
+  errorMessage: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -30,8 +33,17 @@ export class ProductComponent {
     const productId = Number(this.route.snapshot.paramMap.get('id'));
     if (productId) {
       this.productService.getProductById(productId).subscribe({
-        next: (data) => this.product = data,
-        error: (error) => console.error('Error fetching product:', error)
+        next: (response: ApiResponse<Product>) => {
+          if (response.status === true && response.data) {
+            this.product = response.data;
+          } else {
+            this.errorMessage = response.message || 'An error occurred while fetching product';
+          }
+        },
+        error: (error: any) => {
+          this.errorMessage = error.error?.message || 'An error occurred while fetching the product.';
+          console.error('Error fetching product:', error);
+        }
     });
     }
   }
@@ -50,7 +62,7 @@ export class ProductComponent {
       error: (error) => {
         console.error('Error adding product to cart:', error);
 
-        if (error.status === 401) {  // Unauthorized (token expired)
+        if (error.status === 401) {  
           alert('Your session has expired. Please log in again.');
           this.logout();
         } else {

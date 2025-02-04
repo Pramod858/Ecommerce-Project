@@ -1,37 +1,37 @@
 package com.project.service;
 
+import com.project.dto.ShippingAddressDTO;
+import com.project.entity.ShippingAddress;
+import com.project.entity.User;
+import com.project.exception.ResourceConflictException;
+import com.project.exception.ResourceNotFoundException;
+import com.project.repository.ShippingAddressRepository;
+import com.project.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.project.dto.ShippingAddressDTO;
-import com.project.entity.Order;
-import com.project.entity.ShippingAddress;
-import com.project.entity.User;
-import com.project.exception.OrderNotFoundException;
-import com.project.exception.ShippingAddressNotFoundException;
-import com.project.exception.UserNotFoundException;
-import com.project.repository.OrderRepository;
-import com.project.repository.ShippingAddressRepository;
-import com.project.repository.UserRepository;
-
 @Service
 public class ShippingAddressServiceImpl implements ShippingAddressService {
-    
-    @Autowired
-    private ShippingAddressRepository shippingAddressRepository;
-    
-    @Autowired
-    private UserRepository userRepository;
+
+    private final ShippingAddressRepository shippingAddressRepository;
+    private final UserRepository userRepository;
+
+    public ShippingAddressServiceImpl(ShippingAddressRepository shippingAddressRepository, UserRepository userRepository) {
+        this.shippingAddressRepository = shippingAddressRepository;
+        this.userRepository = userRepository;
+    }
 
     @Override
-    public void addAddress(Long userId, ShippingAddressDTO shippingAddressDTO)
-            throws UserNotFoundException {
+    public void addAddress(Long userId, ShippingAddressDTO shippingAddressDTO) throws ResourceConflictException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
+        ShippingAddress existingAddress = shippingAddressRepository.findByUserAndStreetAddress(user, shippingAddressDTO.getStreetAddress());
+        if (existingAddress != null) {
+            throw new ResourceConflictException("ShippingAddress", shippingAddressDTO.getStreetAddress());
+        }
 
         ShippingAddress shippingAddress = new ShippingAddress();
         shippingAddress.setUser(user);
@@ -45,48 +45,37 @@ public class ShippingAddressServiceImpl implements ShippingAddressService {
     }
 
     @Override
-    public void updateAddress(Long addressId, ShippingAddressDTO shippingAddressDTO) throws ShippingAddressNotFoundException {
+    public void updateAddress(Long addressId, ShippingAddressDTO shippingAddressDTO) throws ResourceNotFoundException {
         ShippingAddress shippingAddress = shippingAddressRepository.findById(addressId)
-                .orElseThrow(() -> new ShippingAddressNotFoundException("Shipping address not found with id: " + addressId));
+                .orElseThrow(() -> new ResourceNotFoundException("ShippingAddress", addressId));
 
-        if (shippingAddressDTO.getStreetAddress() != null) {
-            shippingAddress.setStreetAddress(shippingAddressDTO.getStreetAddress());
-        }
-        if (shippingAddressDTO.getCity() != null) {
-            shippingAddress.setCity(shippingAddressDTO.getCity());
-        }
-        if (shippingAddressDTO.getState() != null) {
-            shippingAddress.setState(shippingAddressDTO.getState());
-        }
-        if (shippingAddressDTO.getZipCode() != null) {
-            shippingAddress.setZipCode(shippingAddressDTO.getZipCode());
-        }
-        if (shippingAddressDTO.getCountry() != null) {
-            shippingAddress.setCountry(shippingAddressDTO.getCountry());
-        }
+        shippingAddress.setStreetAddress(shippingAddressDTO.getStreetAddress());
+        shippingAddress.setCity(shippingAddressDTO.getCity());
+        shippingAddress.setState(shippingAddressDTO.getState());
+        shippingAddress.setZipCode(shippingAddressDTO.getZipCode());
+        shippingAddress.setCountry(shippingAddressDTO.getCountry());
 
         shippingAddressRepository.save(shippingAddress);
     }
 
     @Override
-    public void deleteAddress(Long addressId) throws ShippingAddressNotFoundException {
+    public void deleteAddress(Long addressId) throws ResourceNotFoundException {
         ShippingAddress shippingAddress = shippingAddressRepository.findById(addressId)
-                .orElseThrow(() -> new ShippingAddressNotFoundException("Shipping address not found with id: " + addressId));
+                .orElseThrow(() -> new ResourceNotFoundException("ShippingAddress", addressId));
         shippingAddressRepository.delete(shippingAddress);
     }
 
     @Override
-    public List<ShippingAddressDTO> getAllAddressForUser(Long userId) throws UserNotFoundException {
-        // Validate if the user exists
+    public List<ShippingAddressDTO> getAllAddressForUser(Long userId) throws ResourceNotFoundException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
-        // Retrieve and map addresses to DTOs
-        return shippingAddressRepository.findByUser(user).stream()
-                .map(this::convertToDTO)  // Ensure this line passes ShippingAddress, not User
+        List<ShippingAddress> shippingAddresses = shippingAddressRepository.findByUser(user);
+
+        return shippingAddresses.stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-
 
     private ShippingAddressDTO convertToDTO(ShippingAddress shippingAddress) {
         ShippingAddressDTO dto = new ShippingAddressDTO();
@@ -100,17 +89,14 @@ public class ShippingAddressServiceImpl implements ShippingAddressService {
     }
 
     @Override
-    public ShippingAddressDTO getAddressById(Long addressId) throws ShippingAddressNotFoundException {
+    public ShippingAddressDTO getAddressById(Long addressId) throws ResourceNotFoundException {
         ShippingAddress shippingAddress = shippingAddressRepository.findById(addressId)
-                .orElseThrow(() -> new ShippingAddressNotFoundException("Address not found with id: " + addressId));
+                .orElseThrow(() -> new ResourceNotFoundException("ShippingAddress", addressId));
         return convertToDTO(shippingAddress);
     }
 
-	@Override
-	public boolean isAddressOwnedByUser(Long addressId, Long id) {
-		// TODO Auto-generated method stub
-		return shippingAddressRepository.existsByIdAndUserId(addressId, id);
-	}
-
-
+    @Override
+    public boolean isAddressOwnedByUser(Long addressId, Long userId) {
+        return shippingAddressRepository.existsByIdAndUserId(addressId, userId);
+    }
 }

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -8,12 +9,16 @@ import { Component } from '@angular/core';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
-  searchQuery: string = '';
-  userName: string | null = null;
-  cartCount: number = 0; // Replace with actual cart logic
+  constructor(private router: Router) {
+  }
 
-  constructor() {
-    this.userName = localStorage.getItem('userName');
+  searchQuery: string = '';
+  userName: string = localStorage.getItem('userName') || '';
+
+  cartCount: number = 0;
+
+  logDropdownClick(): void {
+    console.log('Dropdown clicked');
   }
 
   isLoggedIn(): boolean {
@@ -24,5 +29,29 @@ export class NavbarComponent {
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
     window.location.reload();
+  }
+
+  isHomePage(): boolean {
+    return this.router.url === '/home';
+  }
+
+  isCartPage(): boolean {
+    return this.router.url.includes('/cart');
+  }
+
+  isCheckoutPage(): boolean {
+    return this.router.url.includes('/checkout');
+  }
+
+  isOrdersPage(): boolean {
+    return this.router.url.includes('/orders');
+  }
+
+  isLoginPage(): boolean {
+    return this.router.url.includes('/login');
+  }
+
+  isSignupPage(): boolean {
+    return this.router.url.includes('/signup');
   }
 }

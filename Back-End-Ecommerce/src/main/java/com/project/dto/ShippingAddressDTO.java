@@ -1,6 +1,5 @@
 package com.project.dto;
 
-import com.project.entity.Order;
 import com.project.entity.ShippingAddress;
 import com.project.entity.User;
 
@@ -25,6 +24,7 @@ public class ShippingAddressDTO {
 		
 		public static ShippingAddressDTO fromEntity(ShippingAddress shippingAddress) {
 	        ShippingAddressDTO dto = new ShippingAddressDTO();
+	        dto.setId(shippingAddress.getId());
 	        dto.setStreetAddress(shippingAddress.getStreetAddress());
 	        dto.setCity(shippingAddress.getCity());
 	        dto.setState(shippingAddress.getState());

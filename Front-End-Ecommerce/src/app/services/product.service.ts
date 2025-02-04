@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Product } from '../models/product.model';
+import { ApiResponse } from '../models/api.response';
 
 @Injectable({
   providedIn: 'root'
@@ -12,28 +13,28 @@ export class ProductService {
 
   constructor(private http: HttpClient) { }
 
-  getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.baseUrl}`);
+  getProducts(): Observable<ApiResponse<Product[]>> { 
+    return this.http.get<ApiResponse<Product[]>>(this.baseUrl); 
   }
 
-  getProductById(id: number): Observable<Product> {
-    return this.http.get<Product>(`${this.baseUrl}/${id}`);
+  getProductById(id: number): Observable<ApiResponse<Product>> {
+    return this.http.get<ApiResponse<Product>>(`${this.baseUrl}/${id}`);
   }
 
-  addProduct(categoryId: number, product: Product): Observable<Product> {
-    return this.http.post<Product>(`${this.baseUrl}/category/${categoryId}/product`, product);
+  addProduct(categoryId: number, product: Product): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/category/${categoryId}/product`, product);
   }
   
 
-  updateProduct(id: number, product: Product): Observable<Product> {
-    return this.http.put<Product>(`${this.baseUrl}/${id}`, product);
+  updateProduct(id: number, product: Product): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.baseUrl}/${id}`, product);
   }
 
-  deleteProduct(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  deleteProduct(id: number): Observable<ApiResponse<any>> {
+    return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/${id}`);
   }
 
-  getProductsByCategory(categoryId: number): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.baseUrl}/category/${categoryId}/products`);
+  getProductsByCategory(categoryId: number): Observable<ApiResponse<Product[]>> {
+    return this.http.get<ApiResponse<Product[]>>(`${this.baseUrl}/category/${categoryId}/products`);
   }
 }

@@ -1,6 +1,5 @@
 package com.project.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.project.dto.UserDTO;
 import com.project.entity.Cart;
 import com.project.entity.User;
+import com.project.exception.ResourceConflictException;
 import com.project.exception.ResourceNotFoundException;
 import com.project.repository.UserRepository;
 
@@ -24,7 +24,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
@@ -40,32 +39,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void saveUser(UserDTO userDTO) {
-        // Check if email is already registered
+    public void saveUser(UserDTO userDTO) throws ResourceConflictException {
         if (findByEmail(userDTO.getEmail()).isPresent()) {
-            throw new RuntimeException("Email is already taken!");
+            throw new ResourceConflictException("Email", userDTO.getEmail());
         }
 
         if (findByPhone(userDTO.getPhone()).isPresent()) {
-            throw new RuntimeException("Phone number is already taken!");
+            throw new ResourceConflictException("Phone", userDTO.getPhone());
         }
 
-        // Create a new user
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setPhone(userDTO.getPhone());
 
-        // Save user
         User savedUser = userRepository.save(user);
-
-        // Create and associate a cart for the user
+        
         Cart cart = new Cart();
         cart.setUser(savedUser);
         savedUser.setCart(cart);
-
-        // Save user with the cart if cascading is not enabled
+        
         userRepository.save(savedUser);
     }
 
@@ -84,24 +78,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public List<UserDTO> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
-                .map(user -> new UserDTO(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getPhone()))
+        return userRepository.findAll().stream()
+                .map(user -> new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getPhone()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserDTO getUserById(Long userId) {
         return userRepository.findById(userId)
-                .map(user -> new UserDTO(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getPhone()))
+                .map(user -> new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getPhone()))
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId));
     }
 
@@ -110,7 +95,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
-        // Update fields only if new values are provided
         if (userDTO.getUsername() != null && !userDTO.getUsername().isEmpty()) {
             user.setUsername(userDTO.getUsername());
         }
@@ -133,15 +117,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
         userRepository.delete(user);
-    }
-
-    @Override
-    public boolean emailExists(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
-    @Override
-    public boolean phoneExists(String phone) {
-        return userRepository.existsByPhone(phone);
     }
 }

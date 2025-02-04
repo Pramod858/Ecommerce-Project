@@ -2,11 +2,14 @@ package com.project.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -26,7 +29,7 @@ public class Payment {
     private User user;
 
     @NotNull(message = "Order is required")
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
@@ -40,8 +43,22 @@ public class Payment {
     private String paymentMethod;
 
     @NotNull(message = "Payment status is required")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Boolean paymentStatus;
+    private PaymentStatus paymentStatus;
+
+    // Credit Card specific fields
+    @Column(name = "card_number", length = 4)
+    private String cardNumber; // Last 4 digits of the card
+
+    @Column(name = "cardCVV")
+    private String cardCVV;
+    
+    @Column(name = "card_expiry", length = 7)
+    private String cardExpiry; // Card expiry date (MM/YYYY format)
+
+    @Column(name = "cardholder_name")
+    private String cardholderName; // Name of the cardholder
 
     // Default Constructor
     public Payment() {
@@ -88,11 +105,43 @@ public class Payment {
         this.paymentMethod = paymentMethod;
     }
 
-    public Boolean getPaymentStatus() {
+    public PaymentStatus getPaymentStatus() {
         return paymentStatus;
     }
 
-    public void setPaymentStatus(Boolean paymentStatus) {
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public String getCardNumber() {
+		return cardNumber;
+	}
+
+	public void setCardNumber(String cardNumber) {
+		this.cardNumber = cardNumber;
+	}
+
+	public String getCardCVV() {
+		return cardCVV;
+	}
+
+	public void setCardCVV(String cardCVV) {
+		this.cardCVV = cardCVV;
+	}
+
+	public String getCardExpiry() {
+        return cardExpiry;
+    }
+
+    public void setCardExpiry(String cardExpiry) {
+        this.cardExpiry = cardExpiry;
+    }
+
+    public String getCardholderName() {
+        return cardholderName;
+    }
+
+    public void setCardholderName(String cardholderName) {
+        this.cardholderName = cardholderName;
     }
 }

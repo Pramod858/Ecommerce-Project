@@ -13,7 +13,7 @@
       <div class="card shadow-sm p-4">
         <h1 class="text-primary">{{ product.name }}</h1>
         <p class="description">{{ product.description }}</p>
-        <h3 class="price text-success">₹{{ product.price }}</h3>
+        <h3 class="price text-success">{{ product.price | currency: 'INR'}}</h3>
 
         <p *ngIf="product.stock > 0" class="text-success fw-bold">In Stock ({{ product.stock }} available)</p>
         <p *ngIf="product.stock === 0" class="text-danger fw-bold">Out of Stock</p>

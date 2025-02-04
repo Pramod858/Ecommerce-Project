@@ -9,10 +9,10 @@ public class ResourceConflictException extends RuntimeException {
     }
 
     public ResourceConflictException(String resourceName, Long id) {
-        super(String.format("%s with ID %d already exists or conflicts", resourceName, id));
+        super(String.format("%s with ID %d already exists", resourceName, id));
     }
     
     public ResourceConflictException(String resourceName, String resource) {
-        super(String.format("%s with ID %s already exists or conflicts", resourceName, resource));
+        super(String.format("%s with ID %s already exists", resourceName, resource));
     }
 }

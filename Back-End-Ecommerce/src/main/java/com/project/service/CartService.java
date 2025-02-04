@@ -3,21 +3,18 @@ package com.project.service;
 import java.util.List;
 
 import com.project.dto.CartDTO;
-import com.project.exception.CartNotFoundException;
-import com.project.exception.ProductNotAvailableException;
-import com.project.exception.ProductNotFoundException;
 
 public interface CartService {
 
-	CartDTO addProductToCart(Long cartId, Long productId, Integer quantity) throws ProductNotFoundException, CartNotFoundException, ProductNotAvailableException;
+	void addProductToCart(Long productId, Integer quantity, Long cartId);
 
 	List<CartDTO> getAllCarts();
 
-	CartDTO getCartById(Long cartId) throws CartNotFoundException;
+	CartDTO getCartById(Long cartId);
 
-	void removeProductFromCart(Long cartId, Long productId) throws CartNotFoundException, ProductNotFoundException;
+	void removeProductFromCart(Long productId, Long cartId);
 
-	void clearCart(Long cartId) throws CartNotFoundException, ProductNotFoundException;
-
+	void clearCart(Long cartId);
+	
 
 }

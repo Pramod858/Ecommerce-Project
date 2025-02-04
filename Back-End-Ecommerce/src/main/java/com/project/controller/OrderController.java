@@ -1,111 +1,113 @@
 package com.project.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.project.dto.OrderDTO;
-import com.project.entity.Cart;
-import com.project.entity.ShippingAddress;
+import com.project.dto.PaymentDTO;
+import com.project.entity.ApiResponse;
+import com.project.entity.OrderStatusUpdateRequest;
 import com.project.entity.User;
-import com.project.exception.CartNotFoundException;
-import com.project.exception.OrderNotFoundException;
-import com.project.exception.ProductNotAvailableException;
-import com.project.exception.UserNotFoundException;
-import com.project.repository.ShippingAddressRepository;
+import com.project.exception.ResourceNotFoundException;
 import com.project.service.AuthService;
 import com.project.service.OrderService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("api/orders")
+@RequestMapping("/api/orders")
 @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
 public class OrderController {
-	
-	@Autowired
-	private OrderService orderService;
-	
-	@Autowired
-	private AuthService authService;
-	
-	@Autowired
-    private ShippingAddressRepository shippingAddressRepository;
-	
-	@PostMapping("/place-order/{addressId}")
-	public ResponseEntity<?> placeOrder(
-	        @RequestHeader("Authorization") String token,
-	        @PathVariable Long addressId) {
-	    try {
-	        // Get user from token using AuthService
-	        User user = authService.getUserFromToken(token);
-	        if (user == null) {
-	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token");
-	        }
 
-	        // Get the user's cart
-	        Cart cart = user.getCart();
-	        if (cart == null) {
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart not found");
-	        }
+    private final OrderService orderService;
+    private final AuthService authService;
 
-	        // Get the shipping address from the repository
-	        ShippingAddress address = shippingAddressRepository.findById(addressId)
-	                .orElseThrow(() -> new IllegalArgumentException("Address not found"));
+    public OrderController(OrderService orderService, AuthService authService) {
+        this.orderService = orderService;
+        this.authService = authService;
+    }
 
-	        // Place the order by passing the cart ID and address
-	        orderService.placeOrder(cart.getId(), address);
-
-	        // Return response indicating order was successfully placed
-	        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseMessage("Order placed successfully!"));
-	    } catch (CartNotFoundException | ProductNotAvailableException e) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-	    } catch (IllegalArgumentException e) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid address ID");
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-	    }
-	}
-
-	
-	@GetMapping
-	public ResponseEntity<?> getAllOrders() {
-		List<OrderDTO> ordersResponse = orderService.getAllOrders();
-		return ResponseEntity.ok(ordersResponse);
-	}
-	
-	@GetMapping("/my-orders")
-	public ResponseEntity<?> getOrdersByUser(@RequestHeader("Authorization") String token) {
-	    try {
-	    	User user = authService.getUserFromToken(token);  // Use AuthService
+    @PostMapping("/place-order/{addressId}")
+    public ResponseEntity<ApiResponse<Void>> createOrder(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long addressId,
+            @RequestBody @Valid PaymentDTO paymentDTO) {
+        try {
+            User user = authService.getUserFromToken(token);
             if (user == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ApiResponse<>(false, "Invalid JWT token"));
             }
-	    	
-	        List<OrderDTO> orders = orderService.getOrdersByUser(user.getId());
-	        return ResponseEntity.ok(orders); // Return with 200 OK status
-	    } catch (UserNotFoundException e) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // Return 404 if user/orders not found
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // Catch any unexpected exceptions
-	    }
-	}
-	
-	
-	@GetMapping("/my-order/{orderId}")
-	public ResponseEntity<?> getOrderByOrderId(@PathVariable Long orderId) {
-	    try {
-	        OrderDTO order = orderService.getOrderByOrderId(orderId);
-	        return ResponseEntity.ok(order);
-	    } catch (OrderNotFoundException e) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-	    }
-	}
+            orderService.placeOrder(user.getId(), user.getCart().getId(), addressId, paymentDTO);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ApiResponse<>(true, "Order placed successfully!"));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "An error occurred: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<OrderDTO>>> getAllOrders() {
+        List<OrderDTO> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Orders retrieved successfully!", orders));
+    }
+
+    @GetMapping("/my-orders")
+    public ResponseEntity<ApiResponse<List<OrderDTO>>> getOrdersByUser(@RequestHeader("Authorization") String token) {
+        try {
+            User user = authService.getUserFromToken(token);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            }
+            List<OrderDTO> orders = orderService.getOrdersByUser(user.getId());
+            return ResponseEntity.ok(new ApiResponse<>(true, "Orders retrieved successfully!", orders));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            		.body(new ApiResponse<>(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            		.body(new ApiResponse<>(false, "An error occurred: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<ApiResponse<Void>> updateOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatusUpdateRequest request) {
+        try {
+            orderService.updateOrderStatus(orderId, request.getStatus());
+            return ResponseEntity.ok(new ApiResponse<>(true, "Order status updated successfully!"));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "An error occurred: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/my-order/{orderId}")
+    public ResponseEntity<ApiResponse<OrderDTO>> getOrderByOrderId(@PathVariable Long orderId) {
+        try {
+            OrderDTO order = orderService.getOrderByOrderId(orderId);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Order retrieved successfully!", order));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            		.body(new ApiResponse<>(false, e.getMessage()));
+        }
+    }
+    
+    @DeleteMapping("/delete-order/{orderId}")
+    public ResponseEntity<ApiResponse<Void>> deleteOrder(@PathVariable Long orderId) {
+    	try {
+    		orderService.deleteOrder(orderId);
+    		return ResponseEntity.ok(new ApiResponse<>(true, "Order deleted successfully!"));
+    	} catch (ResourceNotFoundException e) {
+    		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            		.body(new ApiResponse<>(false, e.getMessage()));
+		}
+    }
 }

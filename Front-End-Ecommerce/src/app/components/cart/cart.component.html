@@ -24,7 +24,7 @@
             <p>{{ item.product.description }}</p>
             <div class="item-quantity">
               <span>Quantity: {{ item.quantity }}</span>
-              <span>Total: ${{ (item.quantity * item.product.price).toFixed(2) }}</span>
+              <span>Total: {{ (item.quantity * item.product.price).toFixed(2) | currency: 'INR'}}</span>
             </div>
           </div>
         </div>
@@ -37,7 +37,7 @@
     <!-- Cart Summary -->
     <div class="cart-summary">
       <div class="total-price mb-4">
-        <h3 class="font-weight-bold">Total Price: ${{ cart.totalPrice.toFixed(2) }}</h3>
+        <h3 class="font-weight-bold">Total Price: {{ cart.totalPrice.toFixed(2) | currency: 'INR'}}</h3>
       </div>
       <div class="cart-actions d-flex justify-content-between">
         <button class="btn btn-secondary btn-sm clear-cart-btn" (click)="clearCart()">

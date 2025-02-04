@@ -1,55 +1,45 @@
 package com.project.service;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.project.entity.Order;
+import com.project.dto.PaymentDTO;
 import com.project.entity.Payment;
 import com.project.entity.User;
-import com.project.exception.OrderNotFoundException;
-import com.project.exception.UserNotFoundException;
-import com.project.repository.OrderRepository;
+import com.project.exception.ResourceNotFoundException;
 import com.project.repository.PaymentRepository;
 import com.project.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-	@Autowired
-	private PaymentRepository paymentRepository;
-	
-	@Autowired
-	private UserRepository userRepository;
-	
-	@Autowired
-	private OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
+    private final UserRepository userRepository;
 
-	@Override
-	public Payment createPayment(Payment payment) throws Exception {
-	    // Check if the user exists (this check is now redundant since the user is already validated in the controller)
-	    Optional<User> user = userRepository.findById(payment.getUser().getId());
-	    if (!user.isPresent()) {
-	        throw new UserNotFoundException("User not found");
-	    }
+    public PaymentServiceImpl(PaymentRepository paymentRepository, UserRepository userRepository) {
+        this.paymentRepository = paymentRepository;
+        this.userRepository = userRepository;
+    }
 
-	    // Check if the order exists
-	    Optional<Order> order = orderRepository.findById(payment.getOrder().getId());
-	    if (!order.isPresent()) {
-	        throw new OrderNotFoundException("Order not found");
-	    }
+    @Override
+    public Payment createPayment(PaymentDTO paymentDTO) {
+        Optional<User> user = userRepository.findById(paymentDTO.getUserId());
+        if (!user.isPresent()) {
+            throw new ResourceNotFoundException("User", paymentDTO.getUserId());
+        }
 
-	    // Set payment details if needed
-	    payment.setPaymentStatus(false); // Assuming payment is pending initially
+        Payment payment = new Payment();
+        payment.setUser(user.get());
+        payment.setAmount(paymentDTO.getAmount());
+        payment.setPaymentMethod(paymentDTO.getPaymentMethod());
+        payment.setPaymentStatus(paymentDTO.getPaymentStatus());
 
-	    // Save the payment
-	    return paymentRepository.save(payment);
-	}
+        return paymentRepository.save(payment);
+    }
 
-	@Override
-	public Payment getPaymentById(Long paymentId) {
-		// TODO Auto-generated method stub
-		return paymentRepository.findById(paymentId).orElse(null);
-	}
+    @Override
+    public Payment getPaymentById(Long paymentId) throws ResourceNotFoundException {
+        return paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment", paymentId));
+    }
 }

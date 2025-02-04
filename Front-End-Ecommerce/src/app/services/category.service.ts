@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Category } from '../models/category.model';
+import { ApiResponse } from '../models/api.response';
 
 @Injectable({
   providedIn: 'root'
@@ -12,18 +13,18 @@ export class CategoryService {
 
   constructor(private http: HttpClient) { }
 
-  getCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.baseUrl}`);
+  getCategories(): Observable<ApiResponse<Category[]>> {
+    return this.http.get<ApiResponse<Category[]>>(`${this.baseUrl}`);
   }
-  addCategory(category: Category): Observable<Category> {
-    return this.http.post<Category>(this.baseUrl, category);
-  }
-
-  updateCategory(categoryId: number, category: Category): Observable<Category> {
-    return this.http.put<Category>(`${this.baseUrl}/${categoryId}`, category);
+  addCategory(category: Category): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(this.baseUrl, category);
   }
 
-  deleteCategory(categoryId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${categoryId}`);
+  updateCategory(categoryId: number, category: Category): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.baseUrl}/${categoryId}`, category);
+  }
+
+  deleteCategory(categoryId: number): Observable<ApiResponse<any>> {
+    return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/${categoryId}`);
   }
 }

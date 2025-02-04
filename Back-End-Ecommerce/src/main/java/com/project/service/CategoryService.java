@@ -4,16 +4,19 @@ import java.util.List;
 
 import com.project.dto.CategoryDTO;
 
+import jakarta.validation.Valid;
+
 public interface CategoryService {
 
-	void addCategory(CategoryDTO categoryDTO);
-	
-	void updateCategory(CategoryDTO categoryDTO, Long categoryId);
+	void addCategory(@Valid CategoryDTO categoryDTO);
+
+	void updateCategory(@Valid CategoryDTO categoryDTO, Long categoryId);
 
 	List<CategoryDTO> getCategories();
 
-	String deleteCategory(Long categoryId);
-
 	CategoryDTO getCategory(Long categoryId);
+
+	void deleteCategory(Long categoryId);
+
 
 }

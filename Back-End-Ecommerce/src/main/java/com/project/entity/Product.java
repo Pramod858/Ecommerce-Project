@@ -48,7 +48,7 @@ public class Product {
     private Integer stock = 0;
 
     @NotBlank(message = "Image URL cannot be blank")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String imageUrl;
 
     @ManyToMany

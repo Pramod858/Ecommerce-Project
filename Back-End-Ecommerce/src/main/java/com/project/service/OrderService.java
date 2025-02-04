@@ -3,20 +3,22 @@ package com.project.service;
 import java.util.List;
 
 import com.project.dto.OrderDTO;
-import com.project.entity.ShippingAddress;
-import com.project.exception.CartNotFoundException;
-import com.project.exception.OrderNotFoundException;
-import com.project.exception.ProductNotAvailableException;
-import com.project.exception.UserNotFoundException;
+import com.project.dto.PaymentDTO;
+
+import jakarta.validation.Valid;
 
 public interface OrderService {
 
+	void placeOrder(Long id, Long cartId, Long addressId, @Valid PaymentDTO paymentDTO);
+
 	List<OrderDTO> getAllOrders();
 
-	List<OrderDTO> getOrdersByUser(Long userId) throws UserNotFoundException;
+	List<OrderDTO> getOrdersByUser(Long id);
 
-	OrderDTO getOrderByOrderId(Long orderId) throws OrderNotFoundException;
+	OrderDTO getOrderByOrderId(Long orderId);
 
-	void placeOrder(Long cartId, ShippingAddress address) throws CartNotFoundException, ProductNotAvailableException;
+	void updateOrderStatus(Long orderId, String status);
+
+	void deleteOrder(Long orderId);
 
 }

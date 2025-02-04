@@ -5,6 +5,7 @@ import { Category } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
 import { CartService } from '../../services/cart.service';
 import { Router } from '@angular/router';
+import { ApiResponse } from '../../models/api.response';
 
 @Component({
   selector: 'app-home',
@@ -16,7 +17,8 @@ import { Router } from '@angular/router';
 export class HomeComponent {
   products: Product[] = [];
   categories: Category[] = [];
-  token: string | null; // Get JWT token from localStorage
+  token: string | null;
+  errorMessage: string | null = null;
 
   constructor(private productService: ProductService, private categoryService: CategoryService, private cartService: CartService, private router: Router) { 
     this.token = localStorage.getItem('token');
@@ -29,10 +31,15 @@ export class HomeComponent {
 
   fetchProducts() {
     this.productService.getProducts().subscribe({
-      next: (data: Product[]) => {
-        this.products = data;
+      next: (response: ApiResponse<Product[]>) => {
+        if (response.status === true && response.data) {
+          this.products = response.data;
+        } else {
+          this.errorMessage = response.message || 'An error occurred while fetching products.';
+        }
       },
-      error: (error) => {
+      error: (error: any) => {
+        this.errorMessage = error.message || 'An error occurred while fetching products.';
         console.error('Error fetching products:', error);
       }
     });
@@ -40,12 +47,16 @@ export class HomeComponent {
 
   loadCategories(): void {
     this.categoryService.getCategories().subscribe({
-      next: (data) => {
-        console.log("Categories data:", data);
-        this.categories = data;
+      next: (response: ApiResponse<Category[]>) => {
+        if (response.status === true && response.data) {
+          this.categories = response.data;
+        } else {
+          this.errorMessage = response.message || 'An error occurred while fetching categories.';
+        }
       },
-      error: (error) => {
-        console.error("Error loading categories:", error);
+      error: (error: any) => {
+        this.errorMessage = error.message || 'An error occurred while fetching categories.';
+        console.error('Error fetching categories:', error);
       }
     });
   }
@@ -53,12 +64,16 @@ export class HomeComponent {
   getProductsByCategory(categoryId: number) {
     if (categoryId) {
       this.productService.getProductsByCategory(categoryId).subscribe({
-        next: (data) => {
-          console.log("Products by category:", data);
-          this.products = data;
+        next: (response: ApiResponse<Product[]>) => {
+          if (response.status === true && response.data) {
+            this.products = response.data;
+          } else {
+            this.errorMessage = response.message || 'An error occurred while fetching products.';
+          }
         },
-        error: (error) => {
-          console.error("Error loading products by category:", error);
+        error: (error: any) => {
+          this.errorMessage = error.message || 'An error occurred while fetching products.';
+          console.error('Error fetching products:', error);
         }
       });
     } else {
@@ -78,19 +93,16 @@ export class HomeComponent {
       return;
     }
     this.cartService.addProductToCart(productId, quantity,  this.token).subscribe({
-      next: (response: any) => {
-        alert('Product added to cart successfully!');
-        console.log('Product added to cart:', response);
-      },
-      error: (error) => {
-        console.error('Error adding product to cart:', error);
-
-        if (error.status === 401) {  // Unauthorized (token expired)
-          alert('Your session has expired. Please log in again.');
-          this.logout();
+      next: (response: ApiResponse<any>) => {
+        if (response.status === true) {
+          alert('Product added to cart successfully!');
         } else {
-          alert(error.error?.message || 'Please try again.');
+          this.errorMessage = response.message || 'An error occurred while adding the product to the cart.';
         }
+      },
+      error: (error: any) => {
+        this.errorMessage = error.message || 'An error occurred while adding the product to the cart.'
+        console.error('Error adding product to cart:', error);
       }
     });
   }

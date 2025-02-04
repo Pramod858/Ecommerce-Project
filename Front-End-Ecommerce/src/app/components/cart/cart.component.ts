@@ -3,6 +3,8 @@ import { CartService } from '../../services/cart.service';
 import { Router } from '@angular/router';
 import { CartItem } from '../../models/cartItem.model';
 import { Cart } from '../../models/cart.model';
+import { ApiResponse } from '../../models/api.response';
+import { error } from 'jquery';
 
 @Component({
   selector: 'app-cart',
@@ -13,6 +15,7 @@ import { Cart } from '../../models/cart.model';
 export class CartComponent implements OnInit {
   cart: Cart = { id: 0, cartItems: [], totalPrice: 0 };
   token: string | null;
+  errorMessage: string | null = null;
 
   constructor(private cartService: CartService, private router: Router) {
     this.token = localStorage.getItem('token');
@@ -35,18 +38,16 @@ export class CartComponent implements OnInit {
     }
   
     this.cartService.getCart(this.token).subscribe({
-      next: (data) => {
-        this.cart = data;
-      },
-      error: (error) => {
-        console.error('Error fetching cart:', error);
-        if (error.status === 401) {
-          // Token may be invalid or expired, clear it and redirect
-          localStorage.removeItem('token');
-          this.router.navigate(['/login']);
+      next: (response: ApiResponse<Cart>) => {
+        if (response.status === true && response.data) {
+          this.cart = response.data;
         } else {
-          alert('Failed to fetch cart. Try again later.');
+          this.errorMessage = response.message || 'An error occurred while fetching the cart.';
         }
+      },
+      error: (error: any) => {
+        this.errorMessage = error.message || 'An error occurred while fetching the cart.';
+        console.error('Error fetching cart:', error);
       }
     });
   }
@@ -55,18 +56,16 @@ export class CartComponent implements OnInit {
   removeProductFromCart(productId: number) {
     if (!this.token) return;
     this.cartService.removeProductFromCart(productId, this.token).subscribe({
-      next: (respons: any) => {
-        alert("Product removed from the cart");
-        this.getCart()
-      },
-      error: (error) => {
-        console.error('Error removing product:', error);
-        if (error.status === 401) {
-          alert('Session expired. Please log in again.');
-          this.logout();
+      next: (response: ApiResponse<any>) => {
+        if (response.status === true) {
+          this.getCart();
         } else {
-          alert('Failed to remove product. Try again.');
+          this.errorMessage = response.message || 'An error occurred while removing the product from the cart.';
         }
+      },
+      error: (error: any) => {
+        this.errorMessage = error.message || 'An error occurred while removing the product from the cart.';
+        console.error('Error removing product from cart:', error);
       }
     });
   }
@@ -74,18 +73,16 @@ export class CartComponent implements OnInit {
   clearCart() {
     if (!this.token) return;
     this.cartService.clearCart(this.token).subscribe({
-      next: (response: any) => { 
-        alert("Cart cleared");
-        this.getCart()
-      },
-      error: (error) => {
-        console.error('Error clearing cart:', error);
-        if (error.status === 401) {
-          alert('Session expired. Please log in again.');
-          this.logout();
+      next: (response: ApiResponse<any>) => {
+        if (response.status === true) {
+          this.getCart();
         } else {
-          alert('Failed to clear cart. Try again.');
+          this.errorMessage = response.message || 'An error occurred while clearing the cart.';
         }
+      },
+      error: (error: any) => {
+        this.errorMessage = error.message || 'An error occurred while clearing the cart.';
+        console.error('Error clearing cart:', error);
       }
     });
   }

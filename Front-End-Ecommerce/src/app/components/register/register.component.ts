@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
+import { ApiResponse } from '../../models/api.response';
 
 @Component({
   selector: 'app-register',
@@ -14,8 +15,6 @@ export class RegisterComponent {
   confirmPassword = '';
   passwordsDontMatch = false;
   hide = true;
-  emailExists = false;
-  phoneExists = false;
   termsAccepted = false; 
   termsTouched = false;    
 
@@ -29,47 +28,42 @@ export class RegisterComponent {
     this.passwordsDontMatch = this.user.password !== this.confirmPassword;
   }
 
-  checkEmailExists() {
-    this.userService.checkEmailExists(this.user.email).subscribe((exists) => {
-      this.emailExists = exists;
-    });
-  }
-
-  checkPhoneExists() {
-    this.userService.checkPhoneExists(this.user.phone).subscribe((exists) => {
-      this.phoneExists = exists;
-    });
-  }
-
   validateTerms() {
     this.termsTouched = true;
   }
-  
 
+  isStrongPassword(password: string): boolean {
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+    return hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+  }
+  
   register() {
-    if (this.passwordsDontMatch || this.emailExists || this.phoneExists || !this.termsAccepted) {
+    if (!this.isStrongPassword(this.user.password)) {
+      alert('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
+      return;
+    }
+
+    if (this.passwordsDontMatch || !this.termsAccepted) {
       return;
     }
   
     this.authService.register(this.user).subscribe({
-      next: (response: any) => {
-        // Log the response to verify its structure
-        console.log('Response from server:', response);
-  
-        // Assuming the response is of type { message: string }
-        alert("Registered Successfully!"); // Display the message in the popup
-
-        this.router.navigate(['/login'])
+      next: (response: ApiResponse<any>) => {
+        if (response.status === true) {
+          console.log('Registration successful:', response);
+          this.router.navigate(['/login']); // Redirect after registration
+        } else {
+          console.error('Registration failed:', response.message);
+          alert(response.message || 'Registration failed, please try again!');
+        }
       },
       error: (error) => {
-        console.error('Error:', error);
-        
-        // Handle the error, and display the error message if available
-        alert(error.error?.message || 'Error during registration!');
+        console.error('Registration failed:', error);
+        alert(error.error?.message || 'Registration failed, please try again!');
       }
     });
   }
-  
-  
-  
 }

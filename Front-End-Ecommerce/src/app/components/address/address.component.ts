@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AddressService } from '../../services/address.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Address } from '../../models/address.model';
+import { ApiResponse } from '../../models/api.response';
 
 @Component({
   selector: 'app-address',
@@ -18,6 +19,7 @@ export class AddressComponent {
   addressForm: FormGroup;
   isEditMode: boolean = false;
   currentAddressId: number | null = null;
+  errorMessage: string | null = null;
 
   constructor(private addressService: AddressService, private fb: FormBuilder) {
     this.token = localStorage.getItem('token');
@@ -35,16 +37,23 @@ export class AddressComponent {
   }
 
   loadAddresses(): void {
-    if (this.token) {
-      this.addressService.getAllAddressesForUser(this.token).subscribe({
-        next: (data: Address[]) => {
-          this.addresses = data;
-        },
-        error: (error: any) => {
-          console.error("Error loading addresses:", error);
-        }
-      });
+    if (!this.token) {
+      alert('Please log in to view the cart.');
+      return;
     }
+    this.addressService.getAllAddressesForUser(this.token).subscribe({
+      next: (response: ApiResponse<any>) => {
+        if (response.status === true && response.data) {
+          this.addresses = response.data;
+        } else {
+          this.errorMessage = response.message || 'An error occurred while fetching addresses.';
+        }
+      },
+      error: (error: any) => {
+        this.errorMessage = error.message || 'An error occurred while fetching addresses.';
+        console.error("Error fetching addresses:", error);
+      }
+    });
   }
 
   openAddAddressModal(): void {
@@ -87,24 +96,32 @@ export class AddressComponent {
       const addressData: Address = this.addressForm.value;
       if (this.isEditMode && this.currentAddressId) {
         this.addressService.updateAddress(this.currentAddressId, addressData, this.token).subscribe({
-          next: () => {
-            this.loadAddresses();
-            this.closeModal();
+          next: (response: ApiResponse<any>) => {
+            if (response.status === true) {
+              this.closeModal();
+              this.loadAddresses();
+            } else {
+              this.errorMessage = response.message || 'An error occurred while updating the address.';
+            }
           },
-          error: (error) => {
+          error: (error: any) => {
+            this.errorMessage = error.message || 'An error occurred while updating the address.';
             console.error("Error updating address:", error);
           }
         });
       } else {
         this.addressService.addAddress(addressData, this.token).subscribe({
-          next: (response: any) => {
-            alert('Address added successfully!');
-            this.loadAddresses();  // Refresh the list of addresses
-            this.closeModal();
+          next: (response: ApiResponse<any>) => {
+            if (response.status === true) {
+              this.closeModal();
+              this.loadAddresses();
+            } else {
+              this.errorMessage = response.message || 'An error occurred while adding the address.';
+            }
           },
-          error: (error) => {
-            console.error("Error creating address:", error);
-            alert('There was an error adding the address');
+          error: (error: any) => {
+            this.errorMessage = error.message || 'An error occurred while adding the address.';
+            console.error("Error adding address:", error);
           }
         });        
       }
@@ -112,16 +129,23 @@ export class AddressComponent {
   }
 
   deleteAddress(addressId: number): void {
-    if (this.token) {
-      this.addressService.deleteAddress(addressId, this.token).subscribe({
-        next: (response: any) => {
-          alert('Address deleted successfully!');
-          this.loadAddresses();
-        },
-        error: (error) => {
-          console.error("Error deleting address:", error);
-        }
-      });
+    if (!confirm('Are you sure you want to delete this address?')) return;
+    if (!this.token) {
+      alert('Please log in to view the cart.');
+      return;
     }
+    this.addressService.deleteAddress(addressId, this.token).subscribe({
+      next: (response: ApiResponse<any>) => { 
+        if (response.status === true) {
+          this.loadAddresses();
+        } else {
+          this.errorMessage = response.message || 'An error occurred while deleting the address.';
+        }
+      },
+      error: (error: any) => {
+        this.errorMessage = error.message || 'An error occurred while deleting the address.';
+        console.error("Error deleting address:", error);
+      }
+    });
   }
 }

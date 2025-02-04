@@ -20,6 +20,19 @@ import { PaymentComponent } from './components/payment/payment.component';
 import { AddressComponent } from './components/address/address.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { CheckoutComponent } from './components/checkout/checkout.component';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { ErrorComponent } from './components/error/error.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatTableModule } from '@angular/material/table';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AdminLoginComponent } from './components/admin-login/admin-login.component';
+import { FooterComponent } from './components/footer/footer.component';
+
+
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,14 +48,23 @@ import { CheckoutComponent } from './components/checkout/checkout.component';
     OrderDetailsComponent,
     PaymentComponent,
     AddressComponent,
-    CheckoutComponent
+    CheckoutComponent,
+    ErrorComponent,
+    AdminLoginComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    MatDialogModule
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTableModule,
+    ModalModule.forRoot(),
+    NgbModule
   ],
   providers: [
     provideHttpClient(), {provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {hasBackdrop: false}}, provideAnimationsAsync()

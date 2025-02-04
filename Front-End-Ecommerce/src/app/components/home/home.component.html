@@ -22,7 +22,7 @@
       <div class="card product-card shadow-lg border-0">
         <a [routerLink]="['/product', product.id]" class="product-link">
           <div class="image-container overflow-hidden position-relative">
-            <img [src]="'https://placehold.co/600x400'" class="card-img-top" alt="{{ product.name }}">
+            <img [src]="product.imageUrl" class="card-img-top" alt="{{ product.name }}">
             <!-- Hover Effect -->
             <div class="overlay d-flex justify-content-center align-items-center">
               <i class="fas fa-search-plus text-white" style="font-size: 2rem;"></i>
@@ -31,7 +31,7 @@
           <div class="card-body text-center">
             <h5 class="card-title text-dark">{{ product.name }}</h5>
             <p class="card-text text-muted small">{{ product.description }}</p>
-            <h6 class="text-danger font-weight-bold">${{ product.price }}</h6>
+            <h6 class="text-danger font-weight-bold">{{ product.price | currency: 'INR'}}</h6>
           </div>
         </a>
         <button class="btn btn-warning btn-block font-weight-bold" (click)="addToCart(product.id, 1)">
@@ -41,3 +41,5 @@
     </div>
   </div>
 </div>
+
+<app-footer></app-footer>

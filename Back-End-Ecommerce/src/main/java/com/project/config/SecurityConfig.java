@@ -1,6 +1,5 @@
 package com.project.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +24,6 @@ public class SecurityConfig {
     private final UserServiceImpl userServiceImpl;
     private final JwtUtils jwtUtils;
 
-    @Autowired
     public SecurityConfig(UserServiceImpl userServiceImpl, JwtUtils jwtUtils) {
         this.userServiceImpl = userServiceImpl;
         this.jwtUtils = jwtUtils;

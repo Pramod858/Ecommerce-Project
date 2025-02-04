@@ -1,23 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Cart } from '../../models/cart.model';
 import { CartService } from '../../services/cart.service';
 import { Router } from '@angular/router';
 import { AddressService } from '../../services/address.service';
 import { Address } from '../../models/address.model';
 import { OrderService } from '../../services/order.service';
+import { Payment } from '../../models/payment.model';
+import { PaymentStatus } from '../../models/payment-status.enum';
+import { User } from '../../models/user.model';
+import { ApiResponse } from '../../models/api.response';
 
 @Component({
   selector: 'app-checkout',
   standalone: false,
   templateUrl: './checkout.component.html',
-  styleUrls: ['./checkout.component.css']  // Ensure this is `styleUrls` not `styleUrl`
+  styleUrls: ['./checkout.component.css']
 })
-export class CheckoutComponent {
+export class CheckoutComponent implements OnInit {
   cart: Cart = { id: 0, cartItems: [], totalPrice: 0 };
   addresses: Address[] = [];
   selectedAddress: Address | null = null;
   token: string | null;
-  selectedPaymentMethod: string = 'cashOnDelivery';  // Default to 'cashOnDelivery'
+  selectedPaymentMethod: string = 'cashOnDelivery'; // Default payment method
+  user: User | null = null;  // Store user data
+  errorMessage: string | null = null;
+
+  cardNumber: string = '';
+  cardCVV: string = '';
+  cardExpiry: string = '';
+  cardholderName: string = '';
 
   constructor(
     private cartService: CartService,
@@ -31,9 +42,23 @@ export class CheckoutComponent {
   ngOnInit(): void {
     this.getCart();
     this.loadAddresses();
+    this.getUser(); // Load user info
   }
 
-  // Fetch the cart details
+  redirectToAddAddress() {
+    this.router.navigate(['/addresses']); // Modify the path as per your route for adding address
+  }
+
+  // Fetch user details
+  getUser(): void {
+    // Assume user details are stored in localStorage (Modify if needed)
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      this.user = JSON.parse(userData);
+    }
+  }
+
+  // Fetch cart details
   getCart(): void {
     if (!this.token) {
       alert('Please log in to view the cart.');
@@ -42,74 +67,81 @@ export class CheckoutComponent {
     }
 
     this.cartService.getCart(this.token).subscribe({
-      next: (data) => {
-        this.cart = data;
-      },
-      error: (error) => {
-        console.error('Error fetching cart:', error);
-        if (error.status === 401) {
-          // Token may be invalid or expired, clear it and redirect
-          localStorage.removeItem('token');
-          this.router.navigate(['/login']);
+      next: (response: ApiResponse<Cart>) => {
+        if (response.status === true && response.data) {
+          this.cart = response.data;
         } else {
-          alert('Failed to fetch cart. Try again later.');
+          this.errorMessage = response.message || 'An error occurred while fetching the cart.';
         }
+      },
+      error: (error: any) => {
+        this.errorMessage = error.message || 'An error occurred while fetching the cart.';
+        console.error("Error fetching cart:", error);
       }
     });
   }
 
-  // Load the user's saved addresses
+  // Load user's saved addresses
   loadAddresses(): void {
-    if (this.token) {
-      this.addressService.getAllAddressesForUser(this.token).subscribe({
-        next: (data: Address[]) => {
-          this.addresses = data;
-        },
-        error: (error: any) => {
-          console.error("Error loading addresses:", error);
-          alert('Failed to load addresses. Try again later.');
-        }
-      });
-    } else {
-      alert('Token is missing. Please log in again.');
+    if (!this.token) {
+      alert('Please log in to view the cart.');
       this.router.navigate(['/login']);
+      return;
     }
+    this.addressService.getAllAddressesForUser(this.token).subscribe({
+      next: (response: ApiResponse<Address[]>) => {
+        if (response.status === true && response.data) {
+          this.addresses = response.data;
+        } else {
+          this.errorMessage = response.message || 'An error occurred while fetching addresses.';
+        }
+      },
+      error: (error: any) => {
+        this.errorMessage = error.message || 'An error occurred while fetching addresses.';
+        console.error("Error fetching addresses:", error);
+      }
+    });
   }
 
-  // Handle the order confirmation
   onConfirmOrder(): void {
     if (!this.selectedAddress) {
       alert('Please select a shipping address.');
       return;
     }
-
-    const addressId = this.selectedAddress.id;  // Get the selected address ID
-
-    // Check for payment method (Cash on Delivery or other payment methods)
-    if (this.selectedPaymentMethod === 'cashOnDelivery') {
-      this.placeOrder(addressId);
-    } else {
-      alert('Payment method not supported yet.');
-    }
+  
+    const addressId = this.selectedAddress.id;
+  
+    // Prepare the simplified payment data
+    const paymentData = {
+      paymentMethod: this.selectedPaymentMethod,
+      paymentStatus: PaymentStatus.SUCCESS, 
+      cardNumber: this.cardNumber,
+      cardCVV: this.cardCVV,
+      cardExpiry: this.cardExpiry,
+      cardholderName: this.cardholderName
+    };
+  
+    // Place the order
+    this.placeOrder(addressId, paymentData);
   }
+  
 
-  // Call the placeOrder function from OrderService
-  placeOrder(addressId: number): void {
+  // Place order
+  placeOrder(addressId: number, paymentData: any): void {
     if (!this.token) {
       alert('User not authenticated. Please log in.');
       this.router.navigate(['/login']);
       return;
     }
 
-    this.orderService.placeOrder(addressId, this.token).subscribe({
-      next: (response) => {
-        // Handle success
-        alert('Order placed successfully!');
-        this.router.navigate(['/orders']); // Redirect to the orders page or any other page
+    this.orderService.createOrder(this.token, addressId, paymentData).subscribe({
+      next: () => {
+        alert('🎉 Order placed successfully!');
+        localStorage.removeItem('cart'); // Clear cart after order
+        this.router.navigate(['/orders']);
       },
       error: (error) => {
-        // Handle error
-        console.error('Error placing order:', error);
+        console.error('❌ Error placing order:', error);
         alert('An error occurred while placing the order. Please try again later.');
       }
     });

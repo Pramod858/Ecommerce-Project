@@ -1,12 +1,5 @@
 package com.project.dto;
 
-import java.util.List;
-
-import com.project.entity.Cart;
-import com.project.entity.Order;
-import com.project.entity.ShippingAddress;
-
-
 public class UserDTO {
 	
 	private Long id;
@@ -19,7 +12,6 @@ public class UserDTO {
 	
 	private String password;
 	
-
 	public UserDTO() {
 	}
 

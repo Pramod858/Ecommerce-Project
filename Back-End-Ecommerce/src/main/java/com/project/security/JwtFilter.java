@@ -1,8 +1,6 @@
 package com.project.security;
 
 import java.io.IOException;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +19,6 @@ public class JwtFilter extends OncePerRequestFilter{
 	private final UserServiceImpl userServiceImpl;
 	private final JwtUtils jwtUtils;
 	
-	@Autowired
 	public JwtFilter(UserServiceImpl userServiceImpl, JwtUtils jwtUtils) {
 		super();
 		this.userServiceImpl = userServiceImpl;

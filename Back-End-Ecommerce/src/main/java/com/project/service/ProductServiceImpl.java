@@ -1,11 +1,5 @@
 package com.project.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
 import com.project.dto.ProductDTO;
 import com.project.entity.Category;
 import com.project.entity.Product;
@@ -13,6 +7,11 @@ import com.project.exception.ResourceConflictException;
 import com.project.exception.ResourceNotFoundException;
 import com.project.repository.CategoryRepository;
 import com.project.repository.ProductRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -43,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
         newProduct.setDescription(productDTO.getDescription());
         newProduct.setStock(productDTO.getStock());
         newProduct.setImageUrl(productDTO.getImageUrl());
-        
+
         List<Category> categoryList = new ArrayList<>();
         categoryList.add(category);
         newProduct.setCategories(categoryList);
@@ -86,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
             existingProduct.setStock(productDTO.getStock());
         }
         if (productDTO.getImageUrl() != null) {
-        	existingProduct.setImageUrl(productDTO.getImageUrl());
+            existingProduct.setImageUrl(productDTO.getImageUrl());
         }
 
         productRepository.save(existingProduct);
@@ -114,5 +113,4 @@ public class ProductServiceImpl implements ProductService {
                 existingProduct.getImageUrl()
         );
     }
-
 }

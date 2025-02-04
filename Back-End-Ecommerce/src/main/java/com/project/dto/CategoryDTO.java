@@ -16,6 +16,11 @@ public class CategoryDTO {
 	public Long getId() {
 		return id;
 	}
+	
+	public CategoryDTO(Long id, String name) {
+		this.id = id;
+		this.name = name;
+	}
 
 	public CategoryDTO(Long id, String name, List<ProductDTO> products) {
 		super();

@@ -1,6 +1,7 @@
 package com.project.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -52,6 +53,9 @@ public class User {
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShippingAddress> shippingAddresses;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payments = new ArrayList<>();
 
     // Constructors, getters, setters, and toString method
 
@@ -128,6 +132,22 @@ public class User {
 
 	public void setShippingAddress(List<ShippingAddress> shippingAddresses) {
 		this.shippingAddresses = shippingAddresses;
+	}
+
+	public List<ShippingAddress> getShippingAddresses() {
+		return shippingAddresses;
+	}
+
+	public void setShippingAddresses(List<ShippingAddress> shippingAddresses) {
+		this.shippingAddresses = shippingAddresses;
+	}
+
+	public List<Payment> getPayments() {
+		return payments;
+	}
+
+	public void setPayments(List<Payment> payments) {
+		this.payments = payments;
 	}
 
 }
