@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.pramod</groupId>
-	<artifactId>Front-End-Ecommerce</artifactId>
+	<artifactId>Back-End-Ecommerce</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Front-End-Ecommerce</name>
+	<name>Back-End-Ecommerce</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>

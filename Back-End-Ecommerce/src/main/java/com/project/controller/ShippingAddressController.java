@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/addresses")
-@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
 public class ShippingAddressController {
 
     private final ShippingAddressService shippingAddressService;
