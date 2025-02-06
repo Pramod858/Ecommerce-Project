@@ -2,7 +2,7 @@
 FROM node:20-alpine as build
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
@@ -14,13 +14,13 @@ RUN npm install
 COPY . .
 
 # Build the Angular application for production
-RUN npm run build -- --configuration=production
+RUN npm run build --prod
 
 # Use a lightweight web server (Nginx) to serve the Angular app
 FROM nginx:alpine
 
 # Copy the built Angular app from the build stage to the Nginx web server directory
-COPY --from=build /app/dist/front-end-ecommerce /usr/share/nginx/html
+COPY --from=build /usr/src/app/dist/front-end-ecommerce /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE 80
