@@ -23,7 +23,7 @@ FROM nginx:alpine
 COPY --from=build /usr/src/app/dist/front-end-ecommerce /usr/share/nginx/html
 
 # Copy custom Nginx configuration file
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY ./docker/frontend/nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 80
 EXPOSE 80
