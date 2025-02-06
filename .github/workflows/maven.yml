@@ -41,7 +41,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: my-artifact
-        path: target/*.jar
+        path: ./Back-End-Ecommerce/target/*.jar
     
     # Optional: Upload dependency graph for Dependabot
     - name: Update dependency graph
