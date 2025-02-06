@@ -22,7 +22,7 @@ services:
   springboot-app:
     build:
       context: ./Back-End-Ecommerce
-      dockerfile: ./docker/backend/Dockerfile
+      dockerfile: ../docker/backend/Dockerfile
     container_name: springboot_app
     ports:
       - "8080:8080"
@@ -36,7 +36,7 @@ services:
   angular-app:
     build:
       context: ./Front-End-Ecommerce
-      dockerfile: ./docker/frontend/Dockerfile
+      dockerfile: ../docker/frontend/Dockerfile
     container_name: angular_app
     ports:
       - "80:80"
