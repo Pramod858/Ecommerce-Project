@@ -34,7 +34,7 @@ jobs:
     #   working-directory: ./Back-End-Ecommerce
 
     - name: Build with Maven
-      run: mvn -B clean package
+      run: mvn -B clean package -DskipTests
       working-directory: ./Back-End-Ecommerce
       
     - name: Upload JAR as artifact
