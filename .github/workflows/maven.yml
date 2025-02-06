@@ -49,7 +49,7 @@ jobs:
 
     - name: Build the Docker image
       run: |
-        docker build . --file docker/backend/Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/backend-ecommerce:latest
+        docker build . --file ./docker/backend/Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/backend-ecommerce:latest
       working-directory: ./Back-End-Ecommerce
 
     - name: Push Docker image
