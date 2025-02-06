@@ -22,16 +22,16 @@ jobs:
         cache: maven
         
     - name: Compile with Maven
-      run: mvn compile
+      run: mvn -B compile --file pom.xml
       working-directory: ./Back-End-Ecommerce
 
     - name: Test with Maven
-      run: mvn test
+      run: mvn -B test --file po.xml
       working-directory: ./Back-End-Ecommerce
 
-    - name: Build with Maven
-      run: mvn install
-      working-directory: ./Back-End-Ecommerce
+    # - name: Build with Maven
+    #   run: mvn install
+    #   working-directory: ./Back-End-Ecommerce
 
     - uses: actions/upload-artifact@v4
       with:
