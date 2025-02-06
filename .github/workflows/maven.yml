@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -20,29 +19,38 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-        
+
     - name: Compile with Maven
       run: mvn -B compile --file pom.xml
       working-directory: ./Back-End-Ecommerce
 
-    # - name: Test with Maven
-    #   run: mvn -B test --file pom.xml
-    #   working-directory: ./Back-End-Ecommerce
-
-    # - name: Build with Maven
-    #   run: mvn install
-    #   working-directory: ./Back-End-Ecommerce
-
     - name: Build with Maven
       run: mvn -B clean package -DskipTests
       working-directory: ./Back-End-Ecommerce
-      
+
     - name: Upload JAR as artifact
       uses: actions/upload-artifact@v4
       with:
         name: my-artifact
         path: ./Back-End-Ecommerce/target/*.jar
-    
-    - name: Maven Verify
-      run: mvn -B clean verify -DskipTests
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build the Docker image
+      run: |
+        docker build . --file docker/backend/Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/backend-ecommerce:latest
       working-directory: ./Back-End-Ecommerce
+
+    - name: Push Docker image
+      run: |
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend-ecommerce:latest
