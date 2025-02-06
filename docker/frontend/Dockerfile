@@ -26,4 +26,4 @@ COPY --from=build /usr/src/app/dist/front-end-ecommerce /usr/share/nginx/html
 EXPOSE 80
 
 # Start the nginx
-CMD ["nginx", "-g", "daemon off;"]
+# CMD ["nginx", "-g", "daemon off;"]
