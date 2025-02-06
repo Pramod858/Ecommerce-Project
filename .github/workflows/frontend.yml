@@ -25,11 +25,11 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+        
     - name: Build the Docker image
       run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-ecommerce:latest -f docker/frontend/Dockerfile .
-      working-directory: .
+        docker build . --file ../docker/frontend/Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/frontend-ecommerce:latest
+      working-directory: ./Front-End-Ecommerce
 
     - name: Push Docker image
       run: |
