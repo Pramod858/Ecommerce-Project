@@ -21,10 +21,26 @@ jobs:
         distribution: 'temurin'
         cache: maven
         
-    - name: Build with Maven
-      run: mvn -B package  # Run Maven package in the Back-End-Ecommerce directory
+    - name: Compile with Maven
+      run: mvn compile
       working-directory: ./Back-End-Ecommerce
+
+    - name: Test with Maven
+      run: mvn test
+      working-directory: ./Back-End-Ecommerce
+
+    - name: Build with Maven
+      run: mvn install
+      working-directory: ./Back-End-Ecommerce
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: target
     
     # Optional: Upload dependency graph for Dependabot
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+
+
+
