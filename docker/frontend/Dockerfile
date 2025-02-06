@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a parent image for the build stage
-FROM node:20-alpine as build
+FROM node:20-alpine AS build
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
@@ -19,11 +19,14 @@ RUN npm run build --configuration=production
 # Use a lightweight web server (Nginx) to serve the Angular app
 FROM nginx:alpine
 
+# Copy custom Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Copy the built Angular app from the build stage to the Nginx web server directory
 COPY --from=build /usr/src/app/dist/front-end-ecommerce /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE 80
 
-# Start the nginx
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
