@@ -26,7 +26,7 @@ jobs:
       working-directory: ./Back-End-Ecommerce
 
     - name: Test with Maven
-      run: mvn -B test --file po.xml
+      run: mvn -B test --file pom.xml
       working-directory: ./Back-End-Ecommerce
 
     # - name: Build with Maven
