@@ -47,6 +47,10 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    - name: List directory contents
+      run: ls -la ./docker/backend
+      working-directory: ./Back-End-Ecommerce
+
     - name: Build the Docker image
       run: |
         docker build . --file ./docker/backend/Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/backend-ecommerce:latest
