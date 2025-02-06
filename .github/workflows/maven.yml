@@ -48,7 +48,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: List directory contents
-      run: ls -la ./docker/backend
+      run: ls -la
       working-directory: ./Back-End-Ecommerce
 
     - name: Build the Docker image
