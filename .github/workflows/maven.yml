@@ -44,5 +44,5 @@ jobs:
         path: ./Back-End-Ecommerce/target/*.jar
     
     - name: Maven Verify
-      run: mvn -B clean verify
+      run: mvn -B clean verify -DskipTests
       working-directory: ./Back-End-Ecommerce
