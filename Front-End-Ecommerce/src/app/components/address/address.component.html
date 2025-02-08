@@ -1,0 +1,112 @@
+<app-navbar></app-navbar>
+
+<div class="container mt-4">
+  <h2 class="text-center mb-4 text-primary">Manage Addresses</h2>
+
+  <!-- Address List -->
+  <div class="row">
+    <div class="col-md-6 col-lg-4 mb-4" *ngFor="let address of addresses">
+      <div class="card address-item shadow-sm rounded-lg">
+        <div class="card-body">
+          <p class="mb-2 text-muted">
+            <strong>{{ address.streetAddress }}</strong>, {{ address.city }},
+            {{ address.state }}, {{ address.zipCode }}, {{ address.country }}
+          </p>
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-sm btn-warning" (click)="openEditAddressModal(address)">
+              <i class="bi bi-pencil"></i> Edit
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteAddress(address.id)">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Address Button -->
+  <div class="text-center mt-4">
+    <button class="btn btn-success btn-lg" (click)="openAddAddressModal()">
+      <i class="bi bi-plus-circle"></i> Add New Address
+    </button>
+  </div>
+</div>
+
+<!-- Add Address Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h3 class="modal-title">Add Address</h3>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
+          <div class="mb-3">
+            <label class="form-label" for="streetAddress">Street Address</label>
+            <input class="form-control" id="streetAddress" formControlName="streetAddress">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="city">City</label>
+            <input class="form-control" id="city" formControlName="city">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="state">State</label>
+            <input class="form-control" id="state" formControlName="state">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="zipCode">Zip Code</label>
+            <input class="form-control" id="zipCode" formControlName="zipCode">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="country">Country</label>
+            <input class="form-control" id="country" formControlName="country">
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary" [disabled]="addressForm.invalid">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Address Modal -->
+<div class="modal fade" id="editAddressModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h3 class="modal-title">Edit Address</h3>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
+          <div class="mb-3">
+            <label class="form-label" for="streetAddress">Street Address</label>
+            <input class="form-control" id="streetAddress" formControlName="streetAddress">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="city">City</label>
+            <input class="form-control" id="city" formControlName="city">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="state">State</label>
+            <input class="form-control" id="state" formControlName="state">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="zipCode">Zip Code</label>
+            <input class="form-control" id="zipCode" formControlName="zipCode">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="country">Country</label>
+            <input class="form-control" id="country" formControlName="country">
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary" [disabled]="addressForm.invalid">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

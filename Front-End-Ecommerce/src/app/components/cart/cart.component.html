@@ -1,0 +1,52 @@
+<app-navbar></app-navbar>
+<div class="cart-container mt-5">
+  <!-- Empty Cart Message -->
+  <div *ngIf="cart.cartItems.length === 0" class="empty-cart text-center">
+    <h2 class="mb-3">Your Cart is Empty</h2>
+    <p class="mb-4">Add products to your cart to proceed with checkout.</p>
+    <button class="btn btn-warning btn-sm" routerLink="/">
+      <i class="bi bi-cart-plus"></i> Go to Shop
+    </button>
+  </div>
+
+  <!-- Cart Content -->
+  <div *ngIf="cart.cartItems.length > 0" class="cart-content">
+    <h2 class="text-center mb-4">Your Cart</h2>
+
+    <!-- Cart Items List -->
+    <div class="cart-items">
+      <div *ngFor="let item of cart.cartItems" class="cart-item mb-4">
+        <div class="item-details d-flex align-items-center">
+          <img *ngIf="item.product.imageUrl" [src]="item.product.imageUrl" alt="{{ item.product.name }}"
+            class="item-image rounded shadow-sm" />
+          <div class="item-info ml-3">
+            <h3>{{ item.product.name }}</h3>
+            <p>{{ item.product.description }}</p>
+            <div class="item-quantity">
+              <span>Quantity: {{ item.quantity }}</span>
+              <span>Total: {{ (item.quantity * item.product.price).toFixed(2) | currency: 'INR'}}</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm mt-3 remove-btn" (click)="removeProductFromCart(item.product.id)">
+          <i class="bi bi-trash"></i> Remove
+        </button>
+      </div>
+    </div>
+
+    <!-- Cart Summary -->
+    <div class="cart-summary">
+      <div class="total-price mb-4">
+        <h3 class="font-weight-bold">Total Price: {{ cart.totalPrice.toFixed(2) | currency: 'INR'}}</h3>
+      </div>
+      <div class="cart-actions d-flex justify-content-between">
+        <button class="btn btn-secondary btn-sm clear-cart-btn" (click)="clearCart()">
+          <i class="bi bi-trash-fill"></i> Clear Cart
+        </button>
+        <button class="btn btn-primary btn-sm checkout-btn" routerLink="/checkout">
+          <i class="bi bi-check-circle"></i> Proceed to Checkout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

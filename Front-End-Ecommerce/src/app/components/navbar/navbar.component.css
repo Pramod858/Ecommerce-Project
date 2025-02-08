@@ -1,0 +1,20 @@
+.navbar-brand img {
+    max-height: 40px;
+}
+
+.navbar-nav .nav-item {
+    margin: 0 10px;
+}
+
+.badge {
+    font-size: 12px;
+}
+
+.my-item-text {
+    position: absolute;
+    left: 50%; /* Adjust this percentage to move it */
+    transform: translateX(-50%);
+    color: white;
+    font-size: 1.25rem;
+    font-weight: bold;
+}

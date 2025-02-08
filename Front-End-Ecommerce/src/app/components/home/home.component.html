@@ -1,0 +1,49 @@
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+  <h2 class="text-center font-weight-bold mb-4">Our Products</h2>
+
+  <!-- Category Filter -->
+  <div class="row justify-content-center mb-4">
+    <div class="col-lg-4 col-md-6 col-sm-12">
+      <div class="form-group">
+        <label for="categoryFilter" class="font-weight-bold">Filter by Category</label>
+        <select id="categoryFilter" class="form-control" (change)="onCategoryChange($event)">
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category.id">
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Grid -->
+  <div class="row">
+    <div *ngFor="let product of products" class="col-lg-3 col-md-4 col-sm-6 mb-4">
+      <div class="card product-card shadow-lg border-0">
+        <a [routerLink]="['/product', product.id]" class="product-link">
+          <div class="image-container position-relative">
+            <img [src]="product.imageUrl" class="card-img-top" alt="{{ product.name }}">
+            <!-- Hover Effect -->
+            <div class="overlay d-flex justify-content-center align-items-center">
+              <i class="fas fa-search-plus text-white"></i>
+            </div>
+          </div>
+          <div class="card-body text-center">
+            <h5 class="card-title text-dark">{{ product.name }}</h5>
+            <p class="card-text text-muted small">{{ product.description }}</p>
+            <h6 class="text-danger font-weight-bold">
+              {{ product.price | currency: 'INR' }}
+            </h6>
+          </div>
+        </a>
+        <button class="btn btn-warning btn-block font-weight-bold" (click)="addToCart(product.id, 1)">
+          <i class="bi bi-cart-plus"></i> Add to Cart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

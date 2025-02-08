@@ -1,0 +1,104 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark py-2">
+    <div class="container-fluid">
+      <!-- Logo -->
+      <a class="navbar-brand" href="#">
+        <img src="assets\images\logo1.png" alt="Logo" height="100" width="100"/>
+      </a>
+  
+      <!-- Toggle Button for Mobile -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <!-- Navbar Content -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto align-items-center">
+          <!-- Search Bar (Only on Home page) -->
+          <!-- <li class="nav-item w-80" *ngIf="isHomePage()">
+            <form class="d-flex">
+              <input class="form-control me-2" type="search" placeholder="Search products..." aria-label="Search"
+                [(ngModel)]="searchQuery" name="search">
+              <button class="btn btn-warning" type="submit">
+                <i class="bi bi-search"></i>
+              </button>
+            </form>
+          </li> -->
+  
+          <!-- "My Cart" Text (Only on Cart Page) -->
+          <li class="my-item-text" *ngIf="isCartPage()">
+            My Cart
+          </li>
+  
+          <li class="my-item-text" *ngIf="isOrdersPage()">
+            My Orders
+          </li>
+        </ul>
+  
+        <ul class="navbar-nav ms-auto align-items-center">
+          <!-- If user is logged in, show Profile Dropdown -->
+          <li class="nav-item dropdown" *ngIf="isLoggedIn()">
+            <a class="nav-link dropdown-toggle text-white" href="#" id="profileDropdown" role="button"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person-fill"></i> {{ userName }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              <li><a class="dropdown-item" routerLink="/addresses">My Addresses</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" (click)="logout()">Logout</a></li>
+            </ul>
+          </li>
+  
+          <!-- If user is not logged in, show Sign In or Sign Up based on the current page -->
+          <ng-container *ngIf="!isLoggedIn()">
+            <!-- Show Sign Up on Login Page -->
+            <li class="nav-item" *ngIf="isLoginPage()">
+              <a class="nav-link text-white" routerLink="/sign-up">
+                <i class="bi bi-person-plus-fill"></i> Sign Up
+              </a>
+            </li>
+  
+            <!-- Show Sign In on Signup Page -->
+            <li class="nav-item" *ngIf="isSignupPage()">
+              <a class="nav-link text-white" routerLink="/sign-in">
+                <i class="bi bi-person-fill"></i> Sign In
+              </a>
+            </li>
+  
+            <!-- Show Sign In on other pages -->
+            <li class="nav-item" *ngIf="!isLoginPage() && !isSignupPage()">
+              <a class="nav-link text-white" routerLink="/sign-in">
+                <i class="bi bi-person-fill"></i> Sign In
+              </a>
+            </li>
+          </ng-container>
+  
+          <!-- Orders Icon (Visible only if user is logged in) -->
+          <li class="nav-item" *ngIf="isLoggedIn()">
+            <a class="nav-link text-white" routerLink="/orders">
+              <i class="bi bi-box-seam"></i> Orders
+            </a>
+          </li>
+  
+          <!-- Cart Icon (Visible only if user is logged in) -->
+          <li class="nav-item" *ngIf="isLoggedIn()">
+            <a class="nav-link text-white position-relative" routerLink="/my-cart">
+              <i class="bi bi-cart-fill"></i> Cart
+              <span *ngIf="cartCount > 0"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ cartCount }}
+              </span>
+            </a>
+          </li>
+  
+          <!-- Mobile Menu (Hamburger icon) -->
+          <li class="nav-item d-lg-none">
+            <button class="btn btn-dark" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu"
+              aria-expanded="false" aria-controls="mobileMenu">
+              <i class="bi bi-list text-white"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>

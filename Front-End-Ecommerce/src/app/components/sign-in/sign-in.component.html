@@ -1,0 +1,87 @@
+<app-navbar></app-navbar>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header text-center bg-dark text-white py-3">
+          <h4>Sign In</h4>
+          <p class="small">Sign in to continue shopping!</p>
+        </div>
+        <div class="card-body p-3">
+          <form #loginForm="ngForm" (ngSubmit)="login()" novalidate>
+            <!-- Email -->
+            <div class="form-group mb-3">
+              <label for="email" class="form-label small">Email Address</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                <input
+                  type="email"
+                  class="form-control rounded-3"
+                  id="email"
+                  [(ngModel)]="credentials.email"
+                  name="email"
+                  #emailRef="ngModel"
+                  required
+                  email
+                  [ngClass]="{'border-danger': emailRef.invalid && emailRef.touched}"
+                  placeholder="Email Address"
+                />
+                <div class="error-message text-danger small" *ngIf="emailRef.invalid && emailRef.touched">
+                  <span *ngIf="emailRef.errors?.['required']">Email is required</span>
+                  <span *ngIf="emailRef.errors?.['email']">Enter a valid email</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group mb-3 position-relative">
+              <label for="password" class="form-label small">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                <input
+                  [type]="hide ? 'password' : 'text'"
+                  class="form-control rounded-3"
+                  id="password"
+                  [(ngModel)]="credentials.password"
+                  name="password"
+                  #passwordRef="ngModel"
+                  required
+                  minlength="6"
+                  [ngClass]="{'border-danger': passwordRef.invalid && passwordRef.touched}"
+                  placeholder="Password"
+                />
+                <div class="error-message text-danger small" *ngIf="passwordRef.invalid && passwordRef.touched">
+                  <span *ngIf="passwordRef.errors?.['required']">Password is required</span>
+                  <span *ngIf="passwordRef.errors?.['minlength']">Password must be at least 6 characters</span>
+                </div>
+                <span
+                  class="eye-icon position-absolute end-0 top-50 translate-middle-y pe-3"
+                  (click)="hidePassword()"
+                  style="cursor: pointer;"
+                  aria-label="Toggle password visibility"
+                >
+                  <i class="fa" [ngClass]="hide ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- Login Button -->
+            <div class="form-group text-center">
+              <button
+                type="submit"
+                class="btn btn-primary btn-sm rounded-3"
+                [disabled]="loginForm.invalid"
+              >
+                Login
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card-footer text-center bg-light py-3">
+          Don't have an account? <a routerLink="/sign-up" class="text-primary">Sign up here</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
