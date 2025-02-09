@@ -14,7 +14,7 @@ COPY . /usr/src/app/
 RUN npm install
 
 # Build the Angular application for production
-RUN npm run build --configuration production
+RUN npm run build -- --configuration=production
 
 # Use a lightweight web server (Nginx) to serve the Angular app
 FROM nginx:alpine
