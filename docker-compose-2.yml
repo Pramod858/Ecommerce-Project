@@ -34,7 +34,7 @@ services:
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: mypassword
       JWT_SECRET: mysecretkey
-      ANGULAR_URL: http://localhost # Use this for development
+      ANGULAR_URL: http://angular-app # Use this for development
     networks:
       - ecommerce_network
 
