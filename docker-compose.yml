@@ -1,5 +1,8 @@
 version: '3.8'
 
+networks:
+  ecommerce_network:
+
 services:
   mysql:
     image: mysql:8.0
@@ -18,6 +21,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - ecommerce_network
 
   springboot-app:
     build:
@@ -27,11 +32,16 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mydatabase
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: mypassword
+      JWT_SECRET: mysecretkey
+      ANGULAR_URL: http://localhost
+    networks:
+      - ecommerce_network
 
   angular-app:
     build:
@@ -42,6 +52,8 @@ services:
       - "80:80"
     depends_on:
       - springboot-app
+    networks:
+      - ecommerce_network
 
 volumes:
   mysql_data:
