@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { Product } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { ApiResponse } from '../../models/api.response';
 import { ActivatedRoute, Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-product',
@@ -14,16 +15,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class ProductComponent {
   product!: Product;
   quantity: number = 1;
-  token: string | null;
+  token: string | null = null;
   errorMessage: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.token = localStorage.getItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+          this.token = localStorage.getItem('token');
+        }
   }
 
   ngOnInit(): void {
@@ -47,8 +51,9 @@ export class ProductComponent {
 
   addToCart(productId: number, quantity: number) {
     if (!this.token) {
-      alert('Please log in to add products to the cart.');
-      this.router.navigate(['/sign-in']);
+      if (isPlatformBrowser(this.platformId)) {
+              alert('Please login first');
+            }
       return;
     }
     this.cartService.addProductToCart(productId, quantity,  this.token).subscribe({

@@ -29,7 +29,9 @@ export class CartComponent {
 
   ngOnInit(): void {
     if (!this.token) {
-      alert('Please log in to view the cart.');
+      if (isPlatformBrowser(this.platformId)) {
+        alert('Please log in to view the cart.');
+      }
       this.router.navigate(['/sign-in']);
       return;
     }
@@ -38,7 +40,9 @@ export class CartComponent {
 
   getCart() {
     if (!this.token) {
-      alert('Please log in to view the cart.');
+      if (isPlatformBrowser(this.platformId)) {
+        alert('Please log in to view the cart.');
+      }
       this.router.navigate(['/sign-in']);
       return;
     }

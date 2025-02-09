@@ -44,7 +44,9 @@ export class AddressComponent {
 
   loadAddresses(): void {
     if (!this.token) {
-      alert('Please log in to view the cart.');
+      if (isPlatformBrowser(this.platformId)) {
+        alert('Please log in to view the cart.');
+      }
       return;
     }
     this.addressService.getAllAddressesForUser(this.token).subscribe({
@@ -137,7 +139,9 @@ export class AddressComponent {
   deleteAddress(addressId: number): void {
     if (!confirm('Are you sure you want to delete this address?')) return;
     if (!this.token) {
-      alert('Please log in to view the cart.');
+      if (isPlatformBrowser(this.platformId)) {
+        alert('Please log in to view the cart.');
+      }
       return;
     }
     this.addressService.deleteAddress(addressId, this.token).subscribe({

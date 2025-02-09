@@ -4,13 +4,14 @@ import { Payment } from '../models/payment.model';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/api.response';
 import { Order } from '../models/order.model';
+import { environment } from '../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
 
-  private baseUrl = "http://localhost:8080/api/orders"
+  private baseUrl = `${environment.apiUrl}/api/orders`;
 
   constructor(private http: HttpClient) { }
 
