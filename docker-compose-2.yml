@@ -1,9 +1,8 @@
 version: '3.8'
 
-networks:
-  ecommerce_network:
-
+# Define services
 services:
+  # Database Service (MySQL)
   mysql:
     image: mysql:8.0
     container_name: mysql_db
@@ -22,8 +21,9 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - ecommerce_network
+      - backend  
 
+  # Backend Service (Spring Boot)
   springboot-app:
     image: pramod858/backend-ecommerce:latest
     container_name: springboot_app
@@ -35,16 +35,28 @@ services:
       SPRING_DATASOURCE_PASSWORD: mypassword
       JWT_SECRET: mysecretkey
       ANGULAR_URL: http://angular-app # Use this for development
+    depends_on:
+      - mysql
     networks:
-      - ecommerce_network
+      - backend
+      - frontend
 
+  # Frontend Service (Angular)
   angular-app:
     image: pramod858/frontend-ecommerce:latest
     container_name: angular_app
     ports:
       - "80:80"
+    depends_on:
+      - springboot-app
     networks:
-      - ecommerce_network
+      - frontend  
 
+# Define Networks
+networks:
+  backend:
+  frontend:  
+
+# Define Volumes
 volumes:
   mysql_data:
