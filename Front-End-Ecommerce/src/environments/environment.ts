@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'http://host.docker.internal:8080'
+    apiUrl: 'http://springboot-app:8080'
 };
