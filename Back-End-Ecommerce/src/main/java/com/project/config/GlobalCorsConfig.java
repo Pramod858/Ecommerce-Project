@@ -14,7 +14,7 @@ public class GlobalCorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:80", "http://localhost", "http://angular-app", "http://angular-app:80")
+                .allowedOrigins("http://localhost:80", "http://localhost", "http://angular-app", "http://angular-app:80", 'http://host.docker.internal:80', 'http://host.docker.internal')
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
