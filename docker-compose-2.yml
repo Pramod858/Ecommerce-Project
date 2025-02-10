@@ -21,7 +21,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - backend  
+      - app-network  # Use a single bridge network
 
   # Backend Service (Spring Boot)
   springboot-app:
@@ -34,12 +34,11 @@ services:
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: mypassword
       JWT_SECRET: mysecretkey
-      ANGULAR_URL: http://angular-app # Use this for development
+        #   ANGULAR_URL: http://54.208.208.203 # Use this for development
     depends_on:
       - mysql
     networks:
-      - backend
-      - frontend
+      - app-network  # Use a single bridge network
 
   # Frontend Service (Angular)
   angular-app:
@@ -50,12 +49,12 @@ services:
     depends_on:
       - springboot-app
     networks:
-      - frontend  
+      - app-network  # Use a single bridge network
 
 # Define Networks
 networks:
-  backend:
-  frontend:  
+  app-network:
+    driver: bridge  # Explicitly define a bridge network
 
 # Define Volumes
 volumes:
