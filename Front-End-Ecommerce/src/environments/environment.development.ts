@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    apiUrl: 'http://springboot-app:8080'
+    apiUrl: 'http://54.208.208.203:8080'
 };
