@@ -33,8 +33,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mydatabase
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: mypassword
-      JWT_SECRET: mysecretkey
-        #   ANGULAR_URL: http://54.208.208.203 # Use this for development
+      ANGULAR_URL: http://localhost # Use this for development
     depends_on:
       - mysql
     networks:
@@ -46,6 +45,8 @@ services:
     container_name: angular_app
     ports:
       - "80:80"
+    environment:
+      BACKEND_URL: http://localhost:8080
     depends_on:
       - springboot-app
     networks:
