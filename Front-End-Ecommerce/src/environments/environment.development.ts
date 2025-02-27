@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    apiUrl: 'https://api.internal.pramodpro.xyz'
+    apiUrl: 'http://api.internal.pramodpro.xyz'
 };
