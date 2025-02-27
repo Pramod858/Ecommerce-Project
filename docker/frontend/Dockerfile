@@ -20,7 +20,7 @@ RUN npm run build -- --configuration=production
 FROM nginx:alpine
 
 # Copy custom Nginx configuration
-# COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy the built Angular app from the build stage to the Nginx web server directory
 COPY --from=build /usr/src/app/dist/front-end-ecommerce/browser /usr/share/nginx/html
