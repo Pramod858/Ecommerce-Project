@@ -93,6 +93,7 @@ export class AdminComponent {
     this.userService.getUsers().subscribe({
       next: (response: ApiResponse<User[]>) => {
         if (response.status === true && response.data) {
+          console.log(response.message);
           this.users = response.data;
         } else {
           this.errorMessage = response.message || 'An error occurred while fetching users.';
@@ -136,6 +137,7 @@ export class AdminComponent {
       this.userService.updateUser(this.selectedUser.id, userData).subscribe({
         next: (response: ApiResponse<any>) => {
           if (response.status === true) {
+            console.log(response.message);
             console.log("User updated successfully");
             this.loadUsers();
             this.closeUserModal();
@@ -156,6 +158,7 @@ export class AdminComponent {
     this.userService.deleteUser(id).subscribe({
       next: (response: ApiResponse<any>) => {
         if (response.status === true) {
+          console.log(response.message);
           this.loadUsers();
         } else {
           this.errorMessage = response.message || 'An error occurred while deleting the user.';
@@ -174,6 +177,7 @@ export class AdminComponent {
     this.productService.getProducts().subscribe({
       next: (response: ApiResponse<Product[]>) => {
         if (response.status === true && response.data) {
+          console.log(response.message);
           this.products = response.data;
         } else {
           this.errorMessage = response.message || 'An error occurred while fetching products.';
@@ -233,6 +237,7 @@ export class AdminComponent {
       this.productService.updateProduct(this.selectedProduct.id, productData).subscribe({
         next: (response: ApiResponse<any>) => {
           if (response.status === true) {
+            console.log(response.message);
             this.closeProductModal();
             this.loadProducts();
           } else {
@@ -248,6 +253,7 @@ export class AdminComponent {
       this.productService.addProduct(categoryId, productData).subscribe({
         next: (response: ApiResponse<any>) => {
           if (response.status === true) {
+            console.log(response.message);
             this.closeProductModal();
             this.loadProducts();
           } else {
@@ -267,6 +273,7 @@ export class AdminComponent {
       this.productService.deleteProduct(id).subscribe({
         next: (response: ApiResponse<any>) => {
           if (response.status === true) {
+            console.log(response.message);
             this.loadProducts();
           } else {
             this.errorMessage = response.message || 'An error occurred while deleting the product.';
@@ -285,6 +292,7 @@ export class AdminComponent {
       this.productService.getProductsByCategory(categoryId).subscribe({
         next: (response: ApiResponse<Product[]>) => {
           if (response.status === true && response.data) {
+            console.log(response.message);
             this.products = response.data;
           } else {
             this.errorMessage = response.message || 'An error occurred while fetching products.';
@@ -308,7 +316,7 @@ export class AdminComponent {
     this.categoryService.getCategories().subscribe({
       next: (response: ApiResponse<Category[]>) => {
         if (response.status === true && response.data) {
-          console.log('Categories loaded successfully:', response);
+          console.log(response.message);
           this.categories = response.data;
         } else {
           this.errorMessage = response.message || 'An error occurred while fetching categories.';
@@ -366,7 +374,7 @@ export class AdminComponent {
       this.categoryService.updateCategory(categoryData.id, categoryData).subscribe({
         next: (response: ApiResponse<any>) => {
           if (response.status === true) {
-            console.log('Category updated successfully:', response);
+            console.log(response.message);
             this.closeCategoryModal();
             this.loadCategories();
           } else {
@@ -382,7 +390,7 @@ export class AdminComponent {
       this.categoryService.addCategory(categoryData).subscribe({
         next: (response: ApiResponse<any>) => {
           if (response.status === true) {
-            console.log('Category added successfully:', response);
+            console.log(response.message);
             this.closeCategoryModal();
             this.loadCategories();
           } else {
@@ -402,6 +410,7 @@ export class AdminComponent {
       this.categoryService.deleteCategory(id).subscribe({
         next: (response: ApiResponse<any>) => {
           if (response.status === true) {
+            console.log(response.message);
             this.loadCategories();
           } else {
             this.errorMessage = response.message || 'An error occurred while deleting the category.';
@@ -426,6 +435,7 @@ export class AdminComponent {
     this.orderService.getAllOrders().subscribe({
       next: (response: ApiResponse<Order[]>) => {
         if (response.status === true && response.data) {
+          console.log(response.message);
           this.orders = response.data;
         } else {
           this.errorMessage = response.message || 'An error occurred while fetching orders.';
@@ -473,6 +483,7 @@ export class AdminComponent {
       this.orderService.updateOrderStatus(this.selectedOrder.id, updatedStatus).subscribe({
         next: (response: ApiResponse<any>) => {
           if (response.status === true) {
+            console.log(response.message);
             this.closeOrderModal();
             this.getAllOrders();
           } else {
@@ -494,6 +505,7 @@ export class AdminComponent {
     this.orderService.deleteOrder(id).subscribe({
       next: (response: ApiResponse<any>) => {
         if (response.status === true) {
+          console.log(response.message);
           this.getAllOrders();
         } else {
           this.errorMessage = response.message || 'An error occurred while deleting the order.';
@@ -519,6 +531,7 @@ export class AdminComponent {
     this.addressService.getAddressById(addressId).subscribe({
       next: (response: ApiResponse<Address>) => {
         if (response.status === true && response.data) {
+          console.log(response.message);
           this.address = response.data;
         } else {
           this.errorMessage = response.message || 'An error occurred while fetching address.';
