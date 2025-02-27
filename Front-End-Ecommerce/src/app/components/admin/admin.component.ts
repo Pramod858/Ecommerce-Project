@@ -308,6 +308,7 @@ export class AdminComponent {
     this.categoryService.getCategories().subscribe({
       next: (response: ApiResponse<Category[]>) => {
         if (response.status === true && response.data) {
+          console.log('Categories loaded successfully:', response);
           this.categories = response.data;
         } else {
           this.errorMessage = response.message || 'An error occurred while fetching categories.';
@@ -365,6 +366,7 @@ export class AdminComponent {
       this.categoryService.updateCategory(categoryData.id, categoryData).subscribe({
         next: (response: ApiResponse<any>) => {
           if (response.status === true) {
+            console.log('Category updated successfully:', response);
             this.closeCategoryModal();
             this.loadCategories();
           } else {
@@ -380,6 +382,7 @@ export class AdminComponent {
       this.categoryService.addCategory(categoryData).subscribe({
         next: (response: ApiResponse<any>) => {
           if (response.status === true) {
+            console.log('Category added successfully:', response);
             this.closeCategoryModal();
             this.loadCategories();
           } else {
