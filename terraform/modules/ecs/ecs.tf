@@ -127,7 +127,7 @@ resource "aws_ecs_service" "spring_ecs_service" {
 
     load_balancer {
         target_group_arn = aws_lb_target_group.api_target_group.arn
-        container_name   = "${var.environment}"
+        container_name   = "${var.environment}-spring"
         container_port   = var.spring_container_port
     }
 
@@ -249,7 +249,7 @@ resource "aws_ecs_service" "angular_ecs_service" {
 
     load_balancer {
         target_group_arn = aws_lb_target_group.public_target_group.arn
-        container_name   = "${var.environment}"
+        container_name   = "${var.environment}-angular"
         container_port   = var.angular_container_port
     }
 
