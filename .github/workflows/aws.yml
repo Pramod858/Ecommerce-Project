@@ -85,6 +85,7 @@ jobs:
           docker build -f docker/backend/Dockerfile -t $SPRING_ECR_REGISTRY/$SPRING_ECR_REPOSITORY:$IMAGE_TAG .
           docker push $SPRING_ECR_REGISTRY/$SPRING_ECR_REPOSITORY:$IMAGE_TAG
           echo "SPRING_APP_IMAGE=$SPRING_ECR_REGISTRY/$SPRING_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+        working-directory: ./Back-End-Ecommerce
 
       - name: Build, tag, and push image to Amazon ECR (Angular)
         id: build-image-angular
@@ -93,6 +94,7 @@ jobs:
           docker build -f docker/frontend/Dockerfile -t $ANGULAR_ECR_REGISTRY/$ANGULAR_ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ANGULAR_ECR_REGISTRY/$ANGULAR_ECR_REPOSITORY:$IMAGE_TAG
           echo "ANGULAR_APP_IMAGE=$ANGULAR_ECR_REGISTRY/$ANGULAR_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+        working-directory: ./Front-End-Ecommerce
 
   deploy:
     name: Deploy to ECS
