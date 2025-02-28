@@ -1,0 +1,173 @@
+name: Ecommerce App Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Select job to run'
+        required: true
+        type: choice
+        options:
+          - deploy
+          - infra
+        default: deploy
+      action:
+        description: 'Terraform action (apply or destroy)'
+        required: false
+        type: choice
+        options:
+          - apply
+          - destroy
+        default: apply
+        
+env:
+  IMAGE_TAG: ${{ github.sha }}
+  PROJECT_NAME: ecommerce-app
+  ECS_CLUSTER: ecs-cluster
+
+  SPRING_ECR_REPOSITORY: ecommerce-app-spring-ecr
+  SPRING_ECS_SERVICE: spring-ecs-service
+  SPRING_ECS_TASK_DEFINITION: spring-task-definition
+  SPRING_CONTAINER_NAME: spring
+
+  ANGULAR_ECR_REPOSITORY: ecommerce-app-angular-ecr
+  ANGULAR_ECS_SERVICE: angular-ecs-service
+  ANGULAR_ECS_TASK_DEFINITION: angular-task-definition
+  ANGULAR_CONTAINER_NAME: angular
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push-image:
+    name: Build and Push Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.ROLE }}
+          role-session-name: samplerolesession
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to Amazon ECR (Spring Boot)
+        id: build-image-spring
+        run: |
+          SPRING_ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+          docker build -f docker/backend/Dockerfile -t $SPRING_ECR_REGISTRY/$SPRING_ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $SPRING_ECR_REGISTRY/$SPRING_ECR_REPOSITORY:$IMAGE_TAG
+          echo "SPRING_APP_IMAGE=$SPRING_ECR_REGISTRY/$SPRING_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Build, tag, and push image to Amazon ECR (Angular)
+        id: build-image-angular
+        run: |
+          ANGULAR_ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+          docker build -f docker/frontend/Dockerfile -t $ANGULAR_ECR_REGISTRY/$ANGULAR_ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ANGULAR_ECR_REGISTRY/$ANGULAR_ECR_REPOSITORY:$IMAGE_TAG
+          echo "ANGULAR_APP_IMAGE=$ANGULAR_ECR_REGISTRY/$ANGULAR_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    needs: build-and-push-image
+    if: github.event.inputs.job == 'deploy'
+    timeout-minutes: 10
+
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.ROLE }}
+          role-session-name: samplerolesession
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Download ECS task definition (Spring Boot)
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition "${{ env.PROJECT_NAME }}-${{ env.SPRING_ECS_TASK_DEFINITION }}" \
+            --query "taskDefinition" > SpringTaskDefinition.json
+
+      - name: Download ECS task definition (Angular)
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition "${{ env.PROJECT_NAME }}-${{ env.ANGULAR_ECS_TASK_DEFINITION }}" \
+            --query "taskDefinition" > AngularTaskDefinition.json
+
+      - name: Update ECS task definition (Spring Boot)
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: SpringTaskDefinition.json
+          container-name: "${{ env.PROJECT_NAME }}-${{ env.SPRING_CONTAINER_NAME }}"
+          image: ${{ env.SPRING_APP_IMAGE }}
+
+      - name: Update ECS task definition (Angular)
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: AngularTaskDefinition.json
+          container-name: "${{ env.PROJECT_NAME }}-${{ env.ANGULAR_CONTAINER_NAME }}"
+          image: ${{ env.ANGULAR_APP_IMAGE }}
+
+      - name: Deploy updated ECS task definition (Spring Boot)
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: SpringTaskDefinition.json
+          service: "${{ env.PROJECT_NAME }}-${{ env.SPRING_ECS_SERVICE }}"
+          cluster: "${{ env.PROJECT_NAME }}-${{ env.ECS_CLUSTER }}"
+          wait-for-service-stability: true
+
+      - name: Deploy updated ECS task definition (Angular)
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: AngularTaskDefinition.json
+          service: "${{ env.PROJECT_NAME }}-${{ env.ANGULAR_ECS_SERVICE }}"
+          cluster: "${{ env.PROJECT_NAME }}-${{ env.ECS_CLUSTER }}"
+          wait-for-service-stability: true
+
+  infra:
+    name: Update Infrastructure
+    runs-on: ubuntu-latest
+    needs: build-and-push-image
+    if: github.event.inputs.job == 'infra'
+
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+
+      - name: Update Terraform ECS module for Spring and Angular
+        run: |
+          sed -i "s|<image_tag>|${{ env.IMAGE_TAG }}|g" ./terraform/modules/ecs/ecs.tf
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.ROLE }}
+          role-session-name: samplerolesession
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Initialize Terraform
+        run: terraform init -input=false
+        working-directory: ./terraform
+
+      - name: Apply Terraform Plan
+        if: github.event.inputs.action == 'apply'
+        run: terraform apply -auto-approve
+        working-directory: ./terraform
+
+      - name: Destroy Terraform Plan
+        if: github.event.inputs.action == 'destroy'
+        run: terraform destroy -auto-approve
+        working-directory: ./terraform
