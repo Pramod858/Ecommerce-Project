@@ -88,7 +88,7 @@ resource "aws_ecs_task_definition" "spring_task_definition" {
     container_definitions    = <<EOF
 [
     {
-    "name": "${var.environment}",
+    "name": "${var.environment}-spring",
     "image": "${data.aws_ecr_repository.spring_ecr_repo.repository_url}:<image_tag>",
     "essential": true,
     "portMappings": [
@@ -210,7 +210,7 @@ resource "aws_ecs_task_definition" "angular_task_definition" {
     container_definitions    = <<EOF
 [
     {
-    "name": "${var.environment}",
+    "name": "${var.environment}-angular",
     "image": "${data.aws_ecr_repository.angular_ecr_repo.repository_url}:<image_tag>",
     "essential": true,
     "portMappings": [
