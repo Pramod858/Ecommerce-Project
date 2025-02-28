@@ -1,0 +1,106 @@
+name: ECR Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose action: create or delete'
+        required: true
+        default: 'create'
+        type: choice
+        options:
+          - create
+          - delete
+      spring_repository_name:
+        description: 'Spring ECR Repository Name'
+        required: true
+        type: string
+        default: ecommerce-app-spring-ecr
+      angular_repository_name:
+        description: 'Angular ECR Repository Name'
+        required: true
+        type: string
+        default: ecommerce-app-angular-ecr
+
+permissions:
+  id-token: write   # Required for requesting the JWT
+
+jobs:
+  ecr:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.ROLE }}
+        role-session-name: samplerolesession
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Check if Spring ECR repository exists
+      id: check_spring_ecr
+      run: |
+        EXISTS=$(aws ecr describe-repositories --repository-names ${{ github.event.inputs.spring_repository_name }} 2>&1 || echo "RepositoryNotFoundException")
+        if [[ "$EXISTS" == *"RepositoryNotFoundException"* ]]; then
+          echo "spring_repo_exists=false" >> $GITHUB_ENV
+        else
+          echo "spring_repo_exists=true" >> $GITHUB_ENV
+        fi
+
+    - name: Check if Angular ECR repository exists
+      id: check_angular_ecr
+      run: |
+        EXISTS=$(aws ecr describe-repositories --repository-names ${{ github.event.inputs.angular_repository_name }} 2>&1 || echo "RepositoryNotFoundException")
+        if [[ "$EXISTS" == *"RepositoryNotFoundException"* ]]; then
+          echo "angular_repo_exists=false" >> $GITHUB_ENV
+        else
+          echo "angular_repo_exists=true" >> $GITHUB_ENV
+        fi
+
+    # Create Spring ECR repository
+    - name: Create Spring ECR repository
+      if: (github.event.inputs.action == 'create') && (env.spring_repo_exists == 'false')
+      run: |
+        aws ecr create-repository --repository-name ${{ github.event.inputs.spring_repository_name }}
+        echo "Spring ECR repository ${{ github.event.inputs.spring_repository_name }} created successfully."
+
+    # Create Angular ECR repository
+    - name: Create Angular ECR repository
+      if: (github.event.inputs.action == 'create') && (env.angular_repo_exists == 'false')
+      run: |
+        aws ecr create-repository --repository-name ${{ github.event.inputs.angular_repository_name }}
+        echo "Angular ECR repository ${{ github.event.inputs.angular_repository_name }} created successfully."
+
+    # Report Spring ECR repository already exists
+    - name: Report Spring ECR repository already exists
+      if: (github.event.inputs.action == 'create') && (env.spring_repo_exists == 'true')
+      run: echo "Spring ECR repository ${{ github.event.inputs.spring_repository_name }} already exists."
+
+    # Report Angular ECR repository already exists
+    - name: Report Angular ECR repository already exists
+      if: (github.event.inputs.action == 'create') && (env.angular_repo_exists == 'true')
+      run: echo "Angular ECR repository ${{ github.event.inputs.angular_repository_name }} already exists."
+
+    # Delete Spring ECR repository
+    - name: Delete Spring ECR repository
+      if: (github.event.inputs.action == 'delete') && (env.spring_repo_exists == 'true')
+      run: |
+        aws ecr delete-repository --repository-name ${{ github.event.inputs.spring_repository_name }} --force
+        echo "Spring ECR repository ${{ github.event.inputs.spring_repository_name }} deleted successfully."
+
+    # Delete Angular ECR repository
+    - name: Delete Angular ECR repository
+      if: (github.event.inputs.action == 'delete') && (env.angular_repo_exists == 'true')
+      run: |
+        aws ecr delete-repository --repository-name ${{ github.event.inputs.angular_repository_name }} --force
+        echo "Angular ECR repository ${{ github.event.inputs.angular_repository_name }} deleted successfully."
+
+    # Report Spring ECR repository does not exist
+    - name: Report Spring ECR repository does not exist
+      if: (github.event.inputs.action == 'delete') && (env.spring_repo_exists == 'false')
+      run: echo "Spring ECR repository ${{ github.event.inputs.spring_repository_name }} does not exist."
+
+    # Report Angular ECR repository does not exist
+    - name: Report Angular ECR repository does not exist
+      if: (github.event.inputs.action == 'delete') && (env.angular_repo_exists == 'false')
+      run: echo "Angular ECR repository ${{ github.event.inputs.angular_repository_name }} does not exist."
