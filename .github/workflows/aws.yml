@@ -165,7 +165,8 @@ jobs:
 
       - name: Update Terraform ECS module for Spring and Angular
         run: |
-          sed -i "s|<image_tag>|${{ env.IMAGE_TAG }}|g" ./terraform/modules/ecs/ecs.tf
+          sed -i "s|<image_tag>|${{ env.IMAGE_TAG }}|g" ./terraform/modules/ecs/spring-ecs.tf
+          sed -i "s|<image_tag>|${{ env.IMAGE_TAG }}|g" ./terraform/modules/ecs/angular-ecs.tf
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
