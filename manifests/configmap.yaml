@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spring-config
+  namespace: pramod-app
+  labels:
+    app: springboot-app
+data:
+  ANGULAR_URL: "https://app.pramodpro.xyz"
