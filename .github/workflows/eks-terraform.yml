@@ -1,0 +1,49 @@
+name: Apply or Destroy EKS with Terraform
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose action'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
+      var_key_pair:
+        description: 'Key-Pair'
+        required: true
+        default: AWS
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.ROLE }}
+        role-session-name: samplerolesession
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Initialize Terraform
+      run: terraform init -input=false
+      working-directory: ./eks-terraform
+
+    - name: Run Terraform Action
+      id: terraform
+      run: |
+        if [ "${{ github.event.inputs.action }}" == "apply" ]; then
+          terraform apply -auto-approve -var "key_pair=${{ github.event.inputs.var_key_pair }}"
+        elif [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+          terraform destroy -auto-approve -var "key_pair=${{ github.event.inputs.var_key_pair }}"
+        fi
+      working-directory: ./eks-terraform
