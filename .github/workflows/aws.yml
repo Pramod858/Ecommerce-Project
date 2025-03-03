@@ -180,14 +180,14 @@ jobs:
 
       - name: Initialize Terraform
         run: terraform init -input=false
-        working-directory: ./terraform
+        working-directory: ./ecs-terraform
 
       - name: Apply Terraform Plan
         if: github.event.inputs.action == 'apply'
         run: terraform apply -auto-approve
-        working-directory: ./terraform
+        working-directory: ./ecs-terraform
 
       - name: Destroy Terraform Plan
         if: github.event.inputs.action == 'destroy'
         run: terraform destroy -auto-approve
-        working-directory: ./terraform
+        working-directory: ./ecs-terraform
