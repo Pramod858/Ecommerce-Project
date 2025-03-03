@@ -16,6 +16,10 @@ on:
         required: true
         default: AWS
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
