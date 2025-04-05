@@ -1,0 +1,51 @@
+# Default values for pramod-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Namespace
+namespace: ecommerce-app
+
+# ConfigMap
+angularUrl: "https://app.pramodpro.xyz"
+
+# Secrets
+mysqlRootPassword: "rootpass"
+mysqlDatabase: "mydb"
+mysqlUser: "user"
+mysqlPassword: "userpass"
+
+# MySQL Deployment
+mysql:
+  replicas: 1
+  image: "mysql:8.0"
+  port: 3306
+
+# Angular Deployment
+angular:
+  replicas: 1
+  image: "pramod858/frontend-ecommerce:latest"
+  port: 80
+
+# Spring Boot Deployment
+springboot:
+  replicas: 1
+  image: "your-springboot-image:latest"
+  port: 8080
+
+# Services
+serviceType: ClusterIP
+
+# Ingress
+ingress:
+  enabled: true
+  annotations:
+    alb.ingress.kubernetes.io/scheme: "internet-facing"
+    alb.ingress.kubernetes.io/target-type: "ip"
+    alb.ingress.kubernetes.io/certificate-arn: "<acm-cert-arn>"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+  hosts:
+    - host: app.pramodpro.xyz
+      paths: ["/"]
+    - host: api.pramodpro.xyz
+      paths: ["/"]

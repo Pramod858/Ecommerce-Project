@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: springboot-ingress
+  namespace: {{ .Values.namespace }}
+  annotations:
+    {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+spec:
+  ingressClassName: alb
+  rules:
+    - host: {{ .Values.ingress.hosts[1].host }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.hosts[1].paths[0] }}
+            pathType: Prefix
+            backend:
+              service:
+                name: springboot-service
+                port:
+                  number: {{ .Values.angular.port }}

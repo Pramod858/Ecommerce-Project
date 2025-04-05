@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-app
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: springboot-app
+spec:
+  replicas: {{ .Values.springboot.replicas }}
+  selector:
+    matchLabels:
+      app: springboot-app
+  template:
+    metadata:
+      labels:
+        app: springboot-app
+    spec:
+      containers:
+        - name: springboot-app
+          image: {{ .Values.springboot.image }}
+          ports:
+            - containerPort: {{ .Values.springboot.port }}
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://mysql-service:{{ .Values.mysql.port }}/{{ .Values.mysqlDatabase }}"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+            - name: ANGULAR_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: spring-config
+                  key: ANGULAR_URL
