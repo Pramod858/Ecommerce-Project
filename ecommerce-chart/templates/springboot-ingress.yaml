@@ -4,19 +4,21 @@ metadata:
   name: springboot-ingress
   namespace: {{ .Values.namespace }}
   annotations:
-    {{- range $key, $value := .Values.ingress.annotations }}
-    {{ $key }}: {{ $value }}
-    {{- end }}
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/certificate-arn: {{ .Values.alb.certificateArn }}
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
 spec:
   ingressClassName: alb
   rules:
-    - host: {{ .Values.ingress.hosts[1].host }}
+    - host: {{ .Values.springboot.host }}
       http:
         paths:
-          - path: {{ .Values.ingress.hosts[1].paths[0] }}
+          - path: /
             pathType: Prefix
             backend:
               service:
                 name: springboot-service
                 port:
-                  number: {{ .Values.angular.port }}
+                  number: 80

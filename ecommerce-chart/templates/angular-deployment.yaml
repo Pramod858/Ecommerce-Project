@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   name: angular-app
   namespace: {{ .Values.namespace }}
-  labels:
-    app: angular-app
 spec:
   replicas: {{ .Values.angular.replicas }}
   selector:
@@ -19,4 +17,4 @@ spec:
         - name: angular-container
           image: {{ .Values.angular.image }}
           ports:
-            - containerPort: {{ .Values.angular.port }}
+            - containerPort: 80

@@ -4,9 +4,9 @@ metadata:
   name: springboot-service
   namespace: {{ .Values.namespace }}
 spec:
-  type: {{ .Values.serviceType }}
+  type: ClusterIP
   ports:
-    - port: {{ .Values.angular.port }}
-      targetPort: {{ .Values.springboot.port }}
+    - port: 80
+      targetPort: 8080
   selector:
     app: springboot-app

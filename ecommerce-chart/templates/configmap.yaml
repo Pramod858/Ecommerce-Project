@@ -3,7 +3,5 @@ kind: ConfigMap
 metadata:
   name: spring-config
   namespace: {{ .Values.namespace }}
-  labels:
-    app: springboot-app
 data:
-  ANGULAR_URL: {{ .Values.angularUrl }}
+  ANGULAR_URL: {{ .Values.springboot.angularUrl | quote }}

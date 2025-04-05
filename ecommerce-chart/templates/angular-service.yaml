@@ -8,6 +8,6 @@ spec:
     app: angular-app
   ports:
     - protocol: TCP
-      port: {{ .Values.angular.port }}
-      targetPort: {{ .Values.angular.port }}
-  type: {{ .Values.serviceType }}
+      port: 80
+      targetPort: 80
+  type: ClusterIP
